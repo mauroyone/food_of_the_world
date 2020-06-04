@@ -28,8 +28,6 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class ManipulateTableForm(FlaskForm):
-    create = SubmitField('New user?')
+    create = SubmitField('Create')
     demo = SubmitField('Try Me!')
     pick = SubmitField('Pick a country')
-
-    

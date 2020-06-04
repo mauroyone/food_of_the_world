@@ -4,7 +4,7 @@ from app.forms import LoginForm, RegistrationForm, ManipulateTableForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
-from create_db import create_country_table
+from manipulate_db import create_country_table, get_available_country, delete_country_table, get_used_countries
 from random import randint
 
 @app.route('/', methods=['GET', 'POST'])
@@ -16,8 +16,9 @@ def index():
     if form.create.data:
         create_country_table()
     if form.demo.data:
-        flash('{}'.format(randint(0, 10)))
+        flash('{}'.format(get_available_country()))
     if form.pick.data:
+        delete_country_table()
         flash('Pick')
 
     return render_template('index.html', title='Home', form=form)
@@ -55,5 +56,21 @@ def register():
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
+        login_user(user)
+        create_country_table()
+        logout_user()
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    countries_used = get_used_countries()
+    countries = [
+        {'country': countries_used[i].country,
+        'capital': countries_used[i].capital,
+        'flag_url': countries_used[i].flag_url}
+        for i in range(len(countries_used))]
+
+    return render_template('user.html', user=user, countries=countries)
