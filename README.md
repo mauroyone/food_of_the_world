@@ -1,5 +1,5 @@
 # food_of_the_world
-Select a random country and cook a typical dish from there!
+Randomly select a country and cook a typical dish from there!
 
 This is a Python3/Flask app.
 
