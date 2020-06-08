@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Available posts</h1>
+    <hr>
+    {% for country in available_posts %}
+    <table>
+        <tr valign="top">
+            <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
+                width="125" height="75"></td>
+                <td>
+                    <form action="" method="post">
+                        {{ form.hidden_tag() }}
+                        <p>
+                            What did you cook?<br>
+                            {{ form.recipe(cols=40, rows=1)}}<br>
+                        </p>
+                        <p>
+                            Ingredients:<br>
+                            {{ form.ingredients(cols=40, rows=2)}}<br>
+                        </p>
+                        <p>
+                            Steps:<br>
+                            {{ form.steps(cols=40, rows=3)}}<br>
+                        </p>
+                        <p>{{ form.submit() }}</p>
+                    </form>
+                </td>
+        </tr>
+    </table>
+    {% endfor %}
+    {% if prev_url %}
+    <a href="{{ prev_url }}">Newer posts</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">Older posts</a>
+    {% endif %}
+{% endblock %}

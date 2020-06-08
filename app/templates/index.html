@@ -4,14 +4,53 @@
     <table>
         <tr valign="top">
             <td><img src="{{ current_user.avatar(128) }}"></td>
-            <td><h1>Hi: {{ current_user.username }}</h1></td>
+            <td>
+                <h1>Hi: {{ current_user.username }}</h1>
+                {% if form %}
+                <p>Ready to try your luck?<p>
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    <p>{{ form.pick_country() }}</p>
+                </form>
+                <p>You have a total of {{ amount_of_available_countries }} countries yet to taste!</p>
+                <p>You have a total of {{ amount_of_available_posts }} to submit. Share your recipes!</p>
+                
+                {% if amount_of_available_posts %}
+                    <form action="" method="post">
+                    {{ search_form.hidden_tag() }}
+                    <p>{{ post_form.submit(value = 'Let\'s go') }}</p>
+                    </form>
+                {% endif %}
+                </p>
+                {% endif %}
+            </td>
         </tr>
+        <td>
+            {% if search_form %}
+            <form action="" method="post">
+                {{ search_form.hidden_tag() }}
+                <p>
+                    Searching a particular user?<br>
+                    {{ search_form.text(cols=32, rows=1)}}<br>
+                </p>
+                <p>{{ search_form.submit() }}</p>
+            </form>
+            {% endif %}
+        </td>
     </table>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>{{ form.create() }}</p>
-        <p>{{ form.demo() }}</p>
-        <p>{{ form.pick() }}</p>
-    </form>
+    {% for post in posts %}
+        <p><a href="{{ url_for('user', username=post.countries.username) }}">
+        {{ post.countries.username }} 
+        </a>
+        from: <b>{{ post.name }}</b>
+        </p>
+    {% endfor %}
+
+    {% if prev_url %}
+    <a href="{{ prev_url }}">Newer posts</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">Older posts</a>
+    {% endif %}
 
 {% endblock %}

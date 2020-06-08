@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table>
+    <tr valign="top">
+        <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
+            width="125" height="75"></td>
+        <td>Did you know? {{ country.name }}'s capital city is:<br>
+        {{ country.capital }}</td>
+    </tr>
+    {% if user == current_user %}
+    {% if form %}
+        <td>
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            {% if country.available %}
+                <p>{{ form.submit(value='Try now!') }}</p>
+            {% else %}
+                <p>{{ form.submit(value='Want to try another recipe?') }}</p>
+            {% endif %}
+        </form>
+        </td>
+    {% endif %}
+    {% endif %}
+</table>
+{% endblock %}
