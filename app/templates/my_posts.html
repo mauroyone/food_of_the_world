@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Take a look at your creations:</h1>
+    <hr>
+    {% for post in posts %}
+    <table>
+        <tr valign="top">
+            <td><p><img src="{{ post.country_of_origin.flag_url}}" alt="{{ post.country_of_origin.name }}'s flag"
+                width="125" height="75"></p>
+                <p>{{ post.country_of_origin.name }}</p>
+            </td>
+            <td>
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    {{ form.country_id(value=post.country_id) }}
+                <p>
+                    Recipe:<br>
+                    {{ form.recipe(value=post.recipe) }}<br>
+                </p>
+                <p>
+                    Ingredients:<br>
+                    {{ form.ingredients(value=post.ingredients) }}<br>
+                </p>
+                <p>
+                    Steps:<br>
+                    {{ form.steps(value=post.steps) }}<br>
+                </p>
+                <p>{{ form.submit(value='Edit') }}</p>
+                </form>
+            </td>
+        </tr>
+    </table>
+    {% endfor %}
+    {% if prev_url %}
+    <a href="{{ prev_url }}">Newer posts</a>
+    {% endif %}
+    {% if next_url %}
+    <a href="{{ next_url }}">Older posts</a>
+    {% endif %}
+{% endblock %}

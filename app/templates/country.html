@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
+<h1>It's {{country.name}} 's turn</h1>
+<hr>
 <table>
     <tr valign="top">
         <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
@@ -10,15 +12,17 @@
     </tr>
     {% if user == current_user %}
     {% if form %}
+        {{ form.hidden_tag() }}
         <td>
-        <form action="" method="post">
-            {{ form.hidden_tag() }}
             {% if country.available %}
-                <p>{{ form.submit(value='Try now!') }}</p>
+                <form action="" method="post">
+                    <p>{{ form.select(value='Give it a try?') }}</p>
+                </form>
             {% else %}
-                <p>{{ form.submit(value='Want to try another recipe?') }}</p>
+                <form action="" method="post">
+                    <p>{{ form.try_now(value='Try now!') }}</p>
+                </form> 
             {% endif %}
-        </form>
         </td>
     {% endif %}
     {% endif %}

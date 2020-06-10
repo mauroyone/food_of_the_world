@@ -3,28 +3,10 @@
 {% block content %}
     <table>
         <tr valign="top">
-            <td><img src="{{ current_user.avatar(128) }}"></td>
-            <td>
-                <h1>Hi: {{ current_user.username }}</h1>
-                {% if form %}
-                <p>Ready to try your luck?<p>
-                <form action="" method="post">
-                    {{ form.hidden_tag() }}
-                    <p>{{ form.pick_country() }}</p>
-                </form>
-                <p>You have a total of {{ amount_of_available_countries }} countries yet to taste!</p>
-                <p>You have a total of {{ amount_of_available_posts }} to submit. Share your recipes!</p>
-                
-                {% if amount_of_available_posts %}
-                    <form action="" method="post">
-                    {{ search_form.hidden_tag() }}
-                    <p>{{ post_form.submit(value = 'Let\'s go') }}</p>
-                    </form>
-                {% endif %}
-                </p>
-                {% endif %}
-            </td>
-        </tr>
+        <td><img src="{{ current_user.avatar(128) }}"></td>
+        
+        <td><h1>Hi: {{ current_user.username }}</h1></td>
+
         <td>
             {% if search_form %}
             <form action="" method="post">
@@ -37,14 +19,69 @@
             </form>
             {% endif %}
         </td>
+        </tr>
     </table>
+    <table>
+        <tr valign="top">
+        <td>
+            {% if form %}
+                <p>Ready to try your luck?<p>
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    <p>{{ form.pick_country() }}</p>
+                </form>
+        </td>
+        <td>
+                <p>You have a total of {{ amount_of_available_countries }} countries yet to taste!</p>
+                <p>You have a total of {{ amount_of_available_posts }} to submit. Share your recipes!</p>
+            
+                {% if amount_of_available_posts %}
+                    <form action="" method="post">
+                    {{ search_form.hidden_tag() }}
+                    <p>{{ post_form.submit(value = 'Let\'s go') }}</p>
+                    </form>
+                {% endif %}
+            
+            {% endif %}
+        </td>
+        </tr>
+    </table>
+
+
+    <hr>
     {% for post in posts %}
-        <p><a href="{{ url_for('user', username=post.countries.username) }}">
-        {{ post.countries.username }} 
-        </a>
-        from: <b>{{ post.name }}</b>
-        </p>
+    <table>
+        <tr valign="top">
+            <td>
+                <p><a href="{{ url_for('user', username=post.author.username) }}">
+                    {{ post.author.username }}
+                </a></p>
+                <p><img src="{{ post.author.avatar(64) }}"></p>
+            </td>
+            <td>
+                <p>A recipe from:</p>
+                <p>{{ post.country_of_origin.name }}</p>
+                <p><img src="{{ post.country_of_origin.flag_url}}" alt="{{ post.country_of_origin.name }}'s flag"
+                    width="125" height="75"></p>
+            </td>
+            <td>
+                <p>
+                    Recipe:<br>
+                    {{ post.recipe }}
+                </p>
+                <p>
+                    Ingredients:<br>
+                    {{ post.ingredients }}
+                </p>
+                <p>
+                    Steps:<br>
+                    {{ post.steps }}
+                </p>
+            </td>
+        </tr>
+    </table>
     {% endfor %}
+
 
     {% if prev_url %}
     <a href="{{ prev_url }}">Newer posts</a>

@@ -50,16 +50,39 @@
     </table>
     
     <hr>
-    {% for country in countries %}
+    {% for post in posts %}
     <table>
         <tr valign="top">
-            <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
-                width="125" height="75"></td>
-            <td>Did you know? {{ country.name }}'s capital city is:<br>
-            {{ country.capital }}</td>
+            <td>
+                <p><a href="{{ url_for('user', username=post.author.username) }}">
+                    {{ post.author.username }}
+                </a></p>
+                <p><img src="{{ post.author.avatar(50) }}"></p>
+            </td>
+            <td>
+                <p>A recipe from:</p>
+                <p>{{ post.country_of_origin.name }}</p>
+                <p><img src="{{ post.country_of_origin.flag_url}}" alt="{{ post.country_of_origin.name }}'s flag"
+                    width="125" height="75"></p>
+            </td>
+            <td>
+                <p>
+                    Recipe:<br>
+                    {{ post.recipe }}
+                </p>
+                <p>
+                    Ingredients:<br>
+                    {{ post.ingredients }}
+                </p>
+                <p>
+                    Steps:<br>
+                    {{ post.steps }}
+                </p>
+            </td>
         </tr>
     </table>
     {% endfor %}
+    
     {% if prev_url %}
     <a href="{{ prev_url }}">Newer posts</a>
     {% endif %}

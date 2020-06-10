@@ -6,26 +6,36 @@
     {% for country in available_posts %}
     <table>
         <tr valign="top">
-            <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
-                width="125" height="75"></td>
-                <td>
-                    <form action="" method="post">
-                        {{ form.hidden_tag() }}
-                        <p>
-                            What did you cook?<br>
-                            {{ form.recipe(cols=40, rows=1)}}<br>
+            <td><p><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
+                width="125" height="75"></p>
+                <p>{{ country.name }}</p>
+            </td>
+            <td>
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    <p>
+                        What did you cook?<br>
+                        {{ form.recipe(cols=40, rows=1)}}<br>
+                    </p>
+                    <p>
+                        What did you use?<br>
+                        {{ form.ingredients(cols=40, rows=2)}}<br>
+                    </p>
+                    <p>
+                        How did you make it?!<br>
+                        {{ form.steps(cols=40, rows=3)}}<br>
+                    </p>
+                        <style type="text/css">
+                        .hidden{
+                            display: none;
+                            }
+                        </style>
+                        <p class="hidden">
+                        {{ form.country_id(value=country.id) }}
                         </p>
-                        <p>
-                            Ingredients:<br>
-                            {{ form.ingredients(cols=40, rows=2)}}<br>
-                        </p>
-                        <p>
-                            Steps:<br>
-                            {{ form.steps(cols=40, rows=3)}}<br>
-                        </p>
-                        <p>{{ form.submit() }}</p>
-                    </form>
-                </td>
+                    <p>{{ form.submit() }}</p>
+                </form>
+            </td>
         </tr>
     </table>
     {% endfor %}

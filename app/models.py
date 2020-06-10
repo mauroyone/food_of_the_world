@@ -31,7 +31,7 @@ class User(UserMixin, db.Model):
         primaryjoin=(followers.c.follower_id == id),
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
-        
+    
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -56,10 +56,10 @@ class User(UserMixin, db.Model):
             followers.c.followed_id == user.id).count() > 0
 
     def followed_posts(self):
-        return Country.query.filter_by(available=False).join(
-            followers, (followers.c.followed_id == Country.user_id)).filter(
+        return Post.query.join(followers, 
+            (followers.c.followed_id == Post.user_id)).filter(
             followers.c.follower_id == self.id).order_by(
-            Country.timestamp.desc())
+            Post.timestamp.desc())
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
@@ -108,6 +108,13 @@ class Country(db.Model):
 
     def set_time(self):
         self.timestamp = datetime.utcnow()
+
+    def select_now(self):
+        self.available = False
+        self.post_available = True
+
+        db.session.commit()
+
     
     @staticmethod
     def delete_country_table():
@@ -153,12 +160,28 @@ class Country(db.Model):
         countries_used = Country.query.filter_by(available=False, user_id=user.id).order_by(
             Country.timestamp.desc())
         return countries_used
-    
+
     @staticmethod
-    def get_available_posts():
-        available_posts = Country.query.filter_by(post_available=True,
-            user_id=current_user.id).order_by(Country.timestamp.desc())
-        return available_posts
+    def get_country_by_name(user, name):
+        country = Country.query.filter_by(name=name.upper(), user_id=user.id)
+        return country
+
+    @staticmethod
+    def get_country_by_id(id):
+        country = Country.query.filter_by(id=id, user_id=current_user.id).first()
+        return country
+
+    @staticmethod
+    def get_countries_with_available_post():
+        countries_with_available_post = Country.query.filter_by(post_available=True,
+             user_id=current_user.id).order_by(Country.timestamp.desc())
+        return countries_with_available_post
+
+    @staticmethod
+    def get_all_used_countries():
+        countries = Country.query.filter_by(available=False).order_by(
+            Country.timestamp.desc())
+        return countries
 
     @staticmethod
     def count_available_countries():
@@ -174,17 +197,6 @@ class Country(db.Model):
             return 0
         return len(posts)
 
-    @staticmethod
-    def get_country_by_name(user, name):
-        country = Country.query.filter_by(name=name.upper(), user_id=user.id)
-        return country
-
-    @staticmethod
-    def get_all_used_countries():
-        countries = Country.query.filter_by(available=False).order_by(
-            Country.timestamp.desc())
-        return countries
-
     def __repr__(self):
         return 'Country {}'.format(self.name)
 
@@ -198,7 +210,34 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
 
+    @staticmethod
+    def delete_posts():
+        posts = Post.query.filter_by(user_id=current_user.id).all()
+        for post in posts:
+            db.session.delete(post)
+        db.session.commit()
+
+    @staticmethod
+    def post_edit(recipe, ingredients, steps, country_id):
+        post = Post.query.filter_by(user_id=current_user.id, country_id=country_id).first()
+        
+        post.recipe=recipe
+        post.ingredients=ingredients
+        post.steps = steps
+
+        db.session.commit()
+
+    @staticmethod
+    def get_all_posts():
+        return Post.query.order_by(Post.timestamp.desc())
+
+    @staticmethod
+    def get_posts_by_user(user):
+        posts_from_user = Post.query.filter_by(user_id=user.id).order_by(
+            Post.timestamp.desc())
+        return posts_from_user
+
     def __repr__(self):
-        return '<Post {}>'.format(self.body)
+        return '<Post {}>'.format(self.steps)
 
 

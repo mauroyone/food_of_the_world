@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from app.models import User
 
@@ -17,12 +17,12 @@ class RegistrationForm(FlaskForm):
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
-    def validate_username(self):
+    def validate_username(self, username):
         user = User.get_user_by_username(self.username.data).first()
         if user is not None:
             raise ValidationError('Please use a different username.')
 
-    def validate_email(self):
+    def validate_email(self, email):
         user = User.get_user_by_email(self.email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
@@ -34,13 +34,13 @@ class ManipulateTableForm(FlaskForm):
     reset = SubmitField('Reset')
 
 class SearchForm(FlaskForm):
-    text = TextAreaField('text', 
+    text = StringField('Search text',
         validators=[DataRequired(), Length(min=0, max=40)])
     submit = SubmitField('Search')
 
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
-    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)])
+    about_me = StringField('About me', validators=[Length(min=0, max=140)])
     submit = SubmitField('Submit')
 
     def __init__(self, original_username, *args, **kwargs):
@@ -57,12 +57,13 @@ class EmptyForm(FlaskForm):
     submit = SubmitField('Submit')
 
 class RecipePostForm(FlaskForm):
-    recipe = TextAreaField('What\'s for dinner?',
+    recipe = StringField('Recipe title',
     validators=[DataRequired(), Length(min=0, max=32)])
-    ingredients = TextAreaField('What did you use?',
+    ingredients = StringField('Recipe ingredients',
         validators=[DataRequired(), Length(min=0, max=1024)])
-    steps = TextAreaField('How did you do it?!',
+    steps = StringField('Recipe steps',
         validators=[DataRequired(), Length(min=0, max=4096)])
+    country_id = StringField('Country ID', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 
@@ -75,3 +76,7 @@ class ResetPasswordForm(FlaskForm):
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Request Password Reset')
+
+class SelectCountryForm(FlaskForm):
+    select = SubmitField('Give it a try?')
+    try_now = SubmitField('Try now!')
