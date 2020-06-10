@@ -1,14 +1,16 @@
-from flask import render_template, flash, redirect, url_for, request
-from app import app, db
-from app.forms import LoginForm, RegistrationForm, ManipulateTableForm, EditProfileForm
-from app.forms import SearchForm, EmptyForm, ResetPasswordRequestForm, ResetPasswordForm
-from app.forms import RecipePostForm, SelectCountryForm
-from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Country, Post
-from app.email import send_password_reset_email
-from werkzeug.urls import url_parse
 from random import randint
 from datetime import datetime
+from flask import render_template, flash, redirect, url_for, request
+from flask_login import current_user, login_user, logout_user, login_required
+from werkzeug.urls import url_parse
+from app import app, db
+from app.forms import LoginForm, RegistrationForm, PickCountryForm, EditProfileForm
+from app.forms import SearchForm, EmptyForm, ResetPasswordRequestForm, ResetPasswordForm
+from app.forms import RecipePostForm, SelectCountryForm, SearchUserForm, PostRecipeForm
+from app.models import User, Country, Post
+from app.email import send_password_reset_email
+
+
 
 @app.before_request
 def before_request():
@@ -20,23 +22,24 @@ def before_request():
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    manipulate_form = ManipulateTableForm()
-    search_form = SearchForm()
-    post_form = EmptyForm()
-    
+    pick_country_form = PickCountryForm()
+    search_user_form = SearchUserForm()
+    post_recipe_form = PostRecipeForm()
+
     amount_of_available_countries = Country.count_available_countries()
     amount_of_available_posts = Country.count_available_posts()
 
-    if manipulate_form.pick_country.data:
+    if pick_country_form.pick_country.data:
         if amount_of_available_countries == 0:
-            flash('You don\'t have any left country to try.') 
-            flash('Please search for that country you really want' + 
-                'o give another try.') 
+            flash('You don\'t have any left country to try.')
+            flash('Please search for that country you really want' +
+                  'o give another try.')
             flash('Or, if you are brave enough, reset the whole list!')
             return redirect(url_for('user', username=current_user.username))
+
         country = Country.get_available_country()
-        return render_template('country.html', title='Your pick is...',
-                country=country, user=current_user)
+        return redirect(url_for('country', username=current_user.username,
+                                country=country.name))
 
     page = request.args.get('page', 1, type=int)
     posts = current_user.followed_posts().paginate(
@@ -46,8 +49,8 @@ def index():
     prev_url = url_for('index', page=posts.prev_num) \
         if posts.has_prev else None
 
-    if search_form.validate_on_submit():
-        form_data = search_form.text.data
+    if search_user_form.validate_on_submit():
+        form_data = search_user_form.searched_user.data
         user = User.get_user_by_username(form_data).first()
         if user is None:
             flash('User {} not found'.format(form_data))
@@ -56,15 +59,16 @@ def index():
             return redirect(url_for('user', username=user.username))
         return redirect(url_for('index'))
 
-    if post_form.validate_on_submit():
+    if post_recipe_form.validate_on_submit():
         return redirect(url_for('available_posts'))
 
-    return render_template('index.html', title='Home', posts=posts.items, 
-        next_url=next_url, prev_url=prev_url, form=manipulate_form, 
-        search_form=search_form,
-        amount_of_available_countries=amount_of_available_countries,
-        amount_of_available_posts=amount_of_available_posts,
-        post_form=post_form)
+    return render_template('index.html', title='Home', posts=posts.items,
+                           next_url=next_url, prev_url=prev_url,
+                           pick_country_form=pick_country_form,
+                           search_user_form=search_user_form,
+                           amount_of_available_countries=amount_of_available_countries,
+                           amount_of_available_posts=amount_of_available_posts,
+                           post_recipe_form=post_recipe_form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -141,7 +145,7 @@ def register():
 @login_required
 def user(username):
     search_form = SearchForm()
-    reset_form = ManipulateTableForm()
+    reset_form = EmptyForm()
     form = EmptyForm()
 
     user = User.get_user_by_username(username).first()
@@ -164,16 +168,18 @@ def user(username):
             flash('Oops, maybe you mispelled it... {}'.format(form_data))
         else:
             flash('yeah, you searched for {}'.format(form_data))
-            return redirect(url_for('country', username=user.username, country=country.name))
-    
-    if reset_form.reset.data:
+            return redirect(url_for('country', username=user.username,
+                                    country=country.name))
+
+    if reset_form.validate_on_submit():
         Country.create_country_table()
         Post.delete_posts()
         return redirect(url_for('index'))
 
-    return render_template('user.html', user=user, posts=posts.items, 
-        next_url=next_url, prev_url=prev_url, search_form=search_form,
-        reset_form=reset_form, form=form)
+    return render_template('user.html', user=user, posts=posts.items,
+                           next_url=next_url, prev_url=prev_url,
+                           search_form=search_form, reset_form=reset_form,
+                           form=form)
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -243,7 +249,7 @@ def explore():
         if posts.has_prev else None
 
     return render_template('index.html', title='Explore', posts=posts.items,
-        next_url=next_url, prev_url=prev_url)
+                           next_url=next_url, prev_url=prev_url)
 
 @app.route('/user/<username>/country/<country>', methods=['GET', 'POST'])
 @login_required
@@ -259,7 +265,7 @@ def country(username, country):
     if searched_country is None:
         flash('Country {} not found.'.format(country))
         return redirect(url_for('index'))
-    
+
     if form.try_now.data:
         flash('try now')
         return redirect(url_for('available_posts'))
@@ -271,10 +277,9 @@ def country(username, country):
         db.session.commit()
         flash('manual selection')
         return redirect(url_for('available_posts'))
-    
 
     return render_template('country.html', title='Your country',
-        country=searched_country, user=user, form=form)
+                           country=searched_country, user=user, form=form)
 
 @app.route('/available_posts', methods=['GET', 'POST'])
 @login_required
@@ -284,25 +289,29 @@ def available_posts():
     page = request.args.get('page', 1, type=int)
     available_posts = Country.get_countries_with_available_post().paginate(
         page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('index', page=available_posts.next_num) \
+    next_url = url_for('available_posts', page=available_posts.next_num) \
         if available_posts.has_next else None
-    prev_url = url_for('index', page=available_posts.prev_num) \
+    prev_url = url_for('available_posts', page=available_posts.prev_num) \
         if available_posts.has_prev else None
-   
+
     if form.validate_on_submit():
-        country = Country.get_country_by_id(form.country_id.data)
+        country = Country.get_country_by_id(form.country_id.data).first()
+        if country is None:
+            flash('An unhandled error pop up')
+            return redirect(url_for('index'))
         country.set_post_available(False)
 
         post = Post(recipe=form.recipe.data, ingredients=form.ingredients.data,
-            steps=form.steps.data, user_id=current_user.id, country_id=form.country_id.data)
-
+                    steps=form.steps.data, user_id=current_user.id,
+                    country_id=form.country_id.data)
         db.session.add(post)
         db.session.commit()
-        return redirect(url_for('available_posts'))
+        flash('Your post is now alive!')
+        return redirect(url_for('index'))
 
-    return render_template('available_posts.html', title='Available posts', form=form,
-        available_posts=available_posts.items, next_url=next_url,
-        prev_url=prev_url,)
+    return render_template('available_posts.html', title='Available posts',
+                           form=form, available_posts=available_posts.items,
+                           next_url=next_url, prev_url=prev_url,)
 
 @app.route('/my_posts', methods=['GET', 'POST'])
 @login_required
@@ -312,14 +321,15 @@ def my_posts():
     page = request.args.get('page', 1, type=int)
     posts = Post.get_posts_by_user(current_user).paginate(
         page, app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('index', page=posts.next_num) \
+    next_url = url_for('my_posts', page=posts.next_num) \
         if posts.has_next else None
-    prev_url = url_for('index', page=posts.prev_num) \
+    prev_url = url_for('my_posts', page=posts.prev_num) \
         if posts.has_prev else None
 
     if form.validate_on_submit():
         Post.post_edit(form.recipe.data, form.ingredients.data, form.steps.data,
-            form.country_id.data)
+                       form.country_id.data)
 
     return render_template('my_posts.html', title='My creations', form=form,
-        user=current_user, posts=posts.items, next_url=next_url, prev_url=prev_url,)
+                           user=current_user, posts=posts.items,
+                           next_url=next_url, prev_url=prev_url)

@@ -13,8 +13,8 @@ class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField(
-        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    password2 = PasswordField('Repeat Password',
+                              validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
     def validate_username(self, username):
@@ -27,16 +27,21 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
-class ManipulateTableForm(FlaskForm):
-    create = SubmitField('Create')
-    pick_country = SubmitField('Of Course!')
-    delete = SubmitField('Delete')
-    reset = SubmitField('Reset')
+class PickCountryForm(FlaskForm):
+    pick_country = SubmitField('Wish me luck!')
 
 class SearchForm(FlaskForm):
     text = StringField('Search text',
-        validators=[DataRequired(), Length(min=0, max=40)])
+                       validators=[DataRequired(), Length(min=0, max=40)])
     submit = SubmitField('Search')
+
+class SearchUserForm(FlaskForm):
+    searched_user = StringField('Who are you looking for?',
+                                validators=[DataRequired(), Length(min=0, max=40)])
+    submit = SubmitField('Search')
+
+class PostRecipeForm(FlaskForm):
+    submit = SubmitField('Let\'s go')
 
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -58,14 +63,13 @@ class EmptyForm(FlaskForm):
 
 class RecipePostForm(FlaskForm):
     recipe = StringField('Recipe title',
-    validators=[DataRequired(), Length(min=0, max=32)])
+                         validators=[DataRequired(), Length(min=0, max=32)])
     ingredients = StringField('Recipe ingredients',
-        validators=[DataRequired(), Length(min=0, max=1024)])
+                              validators=[DataRequired(), Length(min=0, max=1024)])
     steps = StringField('Recipe steps',
-        validators=[DataRequired(), Length(min=0, max=4096)])
+                        validators=[DataRequired(), Length(min=0, max=4096)])
     country_id = StringField('Country ID', validators=[DataRequired()])
     submit = SubmitField('Submit')
-
 
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])

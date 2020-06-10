@@ -1,92 +1,69 @@
 {% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
 
-{% block content %}
-    <table>
-        <tr valign="top">
-            <td><img src="{{ user.avatar(128) }}"></td>
+{% block app_content %}
+    <table class="table table-hover">
+        <tr>
+            <td width="256px"><img src="{{ user.avatar(256) }}"></td>
             <td>
                 <h1>User: {{ user.username }}</h1>
                 {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
                 {% if user.last_seen %}<p>Last seen on: {{ user.last_seen }}</p>{% endif %}
+                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
                 {% if user == current_user %}
-                <p>
-                    <a href="{{ url_for('edit_profile') }}">Edit your profile</a>
-                </p>
+                <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
                 {% elif not current_user.is_following(user) %}
                 <p>
                     <form action="{{ url_for('follow', username=user.username) }}" method="post">
                         {{ form.hidden_tag() }}
-                        {{ form.submit(value='Follow') }}
+                        {{ form.submit(value='Follow', class_='btn btn-default') }}
                     </form>
                 </p>
                 {% else %}
                 <p>
                     <form action="{{ url_for('unfollow', username=user.username) }}" method="post">
                         {{ form.hidden_tag() }}
-                        {{ form.submit(value='Unfollow') }}
+                        {{ form.submit(value='Unfollow', class_='btn btn-default') }}
                     </form>
                 </p>
                 {% endif %}
-                <td>
-                    <form action="" method="post">
-                        {{ search_form.hidden_tag() }}
-                        <p>
-                            Country name<br>
-                            {{ search_form.text(cols=32, rows=1)}}<br>
-                        </p>
-                        <p>{{ search_form.submit() }}</p>
-                    </form>
-                </td>
-                {% if user == current_user %}
-                <td>
-                    <form action="" method="post">
-                        {{ reset_form.hidden_tag() }}
-                        {{ reset_form.reset() }}
-                    </form>
-                </td>
-                {% endif %}
             </td>
+            <td>
+                <div class="row">
+                <div class="col-md-4">
+                    {{ wtf.quick_form(search_form) }}
+                </div>
+                </div>
+            </td>
+            {% if user == current_user %}
+            <td>
+                <div class="row">
+                <div class="col-md-4">
+                    {{ wtf.quick_form(reset_form) }}
+                </div>
+                </div>
+            </td>
+            {% endif %}
+        </td>
         </tr>
     </table>
-    
+
     <hr>
     {% for post in posts %}
-    <table>
-        <tr valign="top">
-            <td>
-                <p><a href="{{ url_for('user', username=post.author.username) }}">
-                    {{ post.author.username }}
-                </a></p>
-                <p><img src="{{ post.author.avatar(50) }}"></p>
-            </td>
-            <td>
-                <p>A recipe from:</p>
-                <p>{{ post.country_of_origin.name }}</p>
-                <p><img src="{{ post.country_of_origin.flag_url}}" alt="{{ post.country_of_origin.name }}'s flag"
-                    width="125" height="75"></p>
-            </td>
-            <td>
-                <p>
-                    Recipe:<br>
-                    {{ post.recipe }}
-                </p>
-                <p>
-                    Ingredients:<br>
-                    {{ post.ingredients }}
-                </p>
-                <p>
-                    Steps:<br>
-                    {{ post.steps }}
-                </p>
-            </td>
-        </tr>
-    </table>
+        {% include '_post.html' %}
     {% endfor %}
-    
-    {% if prev_url %}
-    <a href="{{ prev_url }}">Newer posts</a>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}">Older posts</a>
-    {% endif %}
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> Newer posts
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    Older posts <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 {% endblock %}

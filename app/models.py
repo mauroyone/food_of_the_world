@@ -1,21 +1,19 @@
-from app import app, db, login
-from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin, current_user
-from hashlib import md5
-from datetime import datetime
 from random import randint
 from time import time
+from datetime import datetime
+from hashlib import md5
 import jwt
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin, current_user
+from app import app, db, login
 
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
 followers = db.Table('followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
-)
+                     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
+                     db.Column('followed_id', db.Integer, db.ForeignKey('user.id')))
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,7 +29,7 @@ class User(UserMixin, db.Model):
         primaryjoin=(followers.c.follower_id == id),
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
-    
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -56,10 +54,10 @@ class User(UserMixin, db.Model):
             followers.c.followed_id == user.id).count() > 0
 
     def followed_posts(self):
-        return Post.query.join(followers, 
-            (followers.c.followed_id == Post.user_id)).filter(
-            followers.c.follower_id == self.id).order_by(
-            Post.timestamp.desc())
+        return Post.query.join(followers,
+                               (followers.c.followed_id == Post.user_id)).filter(
+                                   followers.c.follower_id == self.id).order_by(
+                                       Post.timestamp.desc())
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
@@ -77,13 +75,11 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def get_user_by_username(username):
-        user = User.query.filter_by(username=username)
-        return user
+        return User.query.filter_by(username=username)
 
     @staticmethod
     def get_user_by_email(email):
-        user = User.query.filter_by(email=email)
-        return user
+        return User.query.filter_by(email=email)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -112,14 +108,11 @@ class Country(db.Model):
     def select_now(self):
         self.available = False
         self.post_available = True
-
         db.session.commit()
 
-    
     @staticmethod
     def delete_country_table():
         countries = Country.query.filter_by(user_id=current_user.id).all()
-
         for country in countries:
             db.session.delete(country)
         db.session.commit()
@@ -133,19 +126,19 @@ class Country(db.Model):
                 line = line.rstrip()
                 line = line.split(',')
                 subline = line[0].split(' ')
-                for i in range(len(subline)):
-                    subline[i] = subline[i].capitalize()
-
+                for i, word in enumerate(subline):
+                    subline[i] = word.capitalize()
                 url = ('https://www.countries-ofthe-world.com/flags-normal/flag-of-' +
-                    '-'.join(subline) + '.png')
+                       '-'.join(subline) + '.png')
                 country = Country(name=line[0], capital=line[1],
-                                    flag_url=url, countries=current_user)
+                                  flag_url=url, countries=current_user)
                 db.session.add(country)
                 db.session.commit()
-    
+
     @staticmethod
     def get_available_country():
-        countries = Country.query.filter_by(available=True, user_id=current_user.id).all()
+        countries = Country.query.filter_by(available=True,
+                                            user_id=current_user.id).all()
         if countries is None:
             return
         index = randint(0, len(countries)-1)
@@ -157,42 +150,41 @@ class Country(db.Model):
 
     @staticmethod
     def get_user_used_countries(user):
-        countries_used = Country.query.filter_by(available=False, user_id=user.id).order_by(
-            Country.timestamp.desc())
-        return countries_used
+        return Country.query.filter_by(available=False,
+                                       user_id=user.id).order_by(
+                                           Country.timestamp.desc())
 
     @staticmethod
     def get_country_by_name(user, name):
-        country = Country.query.filter_by(name=name.upper(), user_id=user.id)
-        return country
+        return Country.query.filter_by(name=name.upper(), user_id=user.id)
 
     @staticmethod
     def get_country_by_id(id):
-        country = Country.query.filter_by(id=id, user_id=current_user.id).first()
-        return country
+        return Country.query.filter_by(id=id, user_id=current_user.id)
 
     @staticmethod
     def get_countries_with_available_post():
-        countries_with_available_post = Country.query.filter_by(post_available=True,
-             user_id=current_user.id).order_by(Country.timestamp.desc())
-        return countries_with_available_post
+        return Country.query.filter_by(post_available=True,
+                                       user_id=current_user.id).order_by(
+                                           Country.timestamp.desc())
 
     @staticmethod
     def get_all_used_countries():
-        countries = Country.query.filter_by(available=False).order_by(
+        return Country.query.filter_by(available=False).order_by(
             Country.timestamp.desc())
-        return countries
 
     @staticmethod
     def count_available_countries():
-        countries = Country.query.filter_by(available=True, user_id=current_user.id).all()
+        countries = Country.query.filter_by(available=True,
+                                            user_id=current_user.id).all()
         if countries is None:
             return 0
         return len(countries)
 
     @staticmethod
     def count_available_posts():
-        posts = Country.query.filter_by(post_available=True, user_id=current_user.id).all()
+        posts = Country.query.filter_by(post_available=True,
+                                        user_id=current_user.id).all()
         if posts is None:
             return 0
         return len(posts)
@@ -219,12 +211,11 @@ class Post(db.Model):
 
     @staticmethod
     def post_edit(recipe, ingredients, steps, country_id):
-        post = Post.query.filter_by(user_id=current_user.id, country_id=country_id).first()
-        
-        post.recipe=recipe
-        post.ingredients=ingredients
+        post = Post.query.filter_by(user_id=current_user.id,
+                                    country_id=country_id).first()
+        post.recipe = recipe
+        post.ingredients = ingredients
         post.steps = steps
-
         db.session.commit()
 
     @staticmethod
@@ -233,9 +224,8 @@ class Post(db.Model):
 
     @staticmethod
     def get_posts_by_user(user):
-        posts_from_user = Post.query.filter_by(user_id=user.id).order_by(
+        return Post.query.filter_by(user_id=user.id).order_by(
             Post.timestamp.desc())
-        return posts_from_user
 
     def __repr__(self):
         return '<Post {}>'.format(self.steps)

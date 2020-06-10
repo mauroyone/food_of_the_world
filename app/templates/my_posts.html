@@ -13,7 +13,14 @@
             <td>
                 <form action="" method="post">
                     {{ form.hidden_tag() }}
-                    {{ form.country_id(value=post.country_id) }}
+                    <style type="text/css">
+                        .hidden{
+                            display: none;
+                            }
+                        </style>
+                        <p class="hidden">
+                        {{ form.country_id(value=post.country_of_origin.id) }}
+                        </p>
                 <p>
                     Recipe:<br>
                     {{ form.recipe(value=post.recipe) }}<br>

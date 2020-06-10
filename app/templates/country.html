@@ -1,30 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>It's {{country.name}} 's turn</h1>
-<hr>
-<table>
-    <tr valign="top">
-        <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
-            width="125" height="75"></td>
-        <td>Did you know? {{ country.name }}'s capital city is:<br>
-        {{ country.capital }}</td>
-    </tr>
-    {% if user == current_user %}
-    {% if form %}
-        {{ form.hidden_tag() }}
-        <td>
-            {% if country.available %}
-                <form action="" method="post">
-                    <p>{{ form.select(value='Give it a try?') }}</p>
-                </form>
-            {% else %}
-                <form action="" method="post">
-                    <p>{{ form.try_now(value='Try now!') }}</p>
-                </form> 
-            {% endif %}
-        </td>
-    {% endif %}
-    {% endif %}
-</table>
+    <h1>It's {{country.name}}!</h1>
+    <hr>
+    <table>
+        <tr valign="top">
+            <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
+                width="125" height="75"></td>
+            <td>Did you know? {{ country.name }}'s capital city is:<br>
+            {{ country.capital }}</td>
+        </tr>
+        {% if user == current_user %}
+        {% if form %}
+            {{ form.hidden_tag() }}
+            <td>
+                {% if country.available %}
+                    <form action="" method="post">
+                        <p>{{ form.select(value='Give it a try?') }}</p>
+                    </form>
+                {% else %}
+                    <form action="" method="post">
+                        <p>{{ form.try_now(value='Try now!') }}</p>
+                    </form>
+                {% endif %}
+            </td>
+        {% endif %}
+        {% endif %}
+    </table>
 {% endblock %}
