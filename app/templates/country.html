@@ -1,30 +1,57 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block app_content %}
+<link href="StyleSheet.css" rel="stylesheet">
     <h1>It's {{country.name}}!</h1>
     <hr>
     <table>
-        <tr valign="top">
-            <td><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
-                width="125" height="75"></td>
-            <td>Did you know? {{ country.name }}'s capital city is:<br>
-            {{ country.capital }}</td>
+        <tr valign="center">
+            
+            <td><img class="border" src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
+                width="125" height="80"></td>
+            <td>
+            <center>
+                Did you know? {{ country.name }}'s capital city is:<br>
+                {{ country.capital }}
+            </center>
+            </td>
         </tr>
         {% if user == current_user %}
         {% if form %}
+            <form action="" method="post">
             {{ form.hidden_tag() }}
             <td>
                 {% if country.available %}
-                    <form action="" method="post">
-                        <p>{{ form.select(value='Give it a try?') }}</p>
-                    </form>
+                    <center>
+                        <p>{{ form.select(value='Give it a try?', class_='btn btn-default') }}</p>
+                    </center>
                 {% else %}
-                    <form action="" method="post">
-                        <p>{{ form.try_now(value='Try now!') }}</p>
-                    </form>
+                    <center>
+                        <p>{{ form.try_now(value='Try now!', class_='btn btn-default') }}</p>
+                    </center>
                 {% endif %}
             </td>
+            </form>
         {% endif %}
         {% endif %}
     </table>
+    <hr>
+    <h2>Look what other users made</h2>
+    {% for post in posts %}
+        {% include '_post.html' %}
+    {% endfor %}
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> Newer posts
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    Older posts <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 {% endblock %}

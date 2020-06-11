@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
@@ -6,31 +5,44 @@
     <h1>Hi, {{ current_user.username }}!</h1>
     <table>
     <tr valign="top">
+        {% if form %}
         <td>
             <p>You have a total of {{ amount_of_available_countries }}
                 countries yet to taste!</p>
             <p>You have a total of {{ amount_of_available_posts }}
-                to submit. Share your recipes!</p>
+                to submit.</p>
+        </td>
+        <form action="" method="post">
+        <td>
+        <center>
+            <p>A new adventure is about to begin<p>
+            {{ form.hidden_tag() }}
+            {{ form.pick_country_submit(class_='btn btn-default') }}
+        </center>
         </td>
         <td>
-            {% if pick_country_form %}
-                <p>A new adventure is about to begin<p>
-                {{ wtf.quick_form(pick_country_form) }}
-            {% endif %}
-        </td>
-        <td>
-            {% if post_recipe_form %}
-                <p>Share your creations<p>
-                {{ wtf.quick_form(post_recipe_form) }}
-            {% endif %}
+        <center>
+            <p>Share your creations<p>
+            {{ form.goto_available_posts_submit(class_='btn btn-default') }}
+        
+        </center>
         </td>
     </tr>
+    <tr>
+        <td>
+            {{ form.search_user_text.label }}<br>
+            {{ form.search_user_text(class_='btn btn-default') }}
+            {{ form.search_user_submit(class_='btn btn-default') }}
+        </td>
+        <td>
+            {{ form.search_country_text.label }}<br>
+            {{ form.search_country_text(class_='btn btn-default') }}
+            {{ form.search_country_submit(class_='btn btn-default') }}
+        </td>
+        </form>
+        {% endif %}
+    </tr>
     </table>
-    {% if search_user_form %}
-    {{ wtf.quick_form(search_user_form) }}
-    <br>
-    {% endif %}
-
     <hr>
     {% for post in posts %}
         {% include '_post.html' %}

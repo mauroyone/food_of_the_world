@@ -125,9 +125,7 @@ class Country(db.Model):
             for line in file:
                 line = line.rstrip()
                 line = line.split(',')
-                subline = line[0].split(' ')
-                for i, word in enumerate(subline):
-                    subline[i] = word.capitalize()
+                subline = line[2].split(' ')
                 url = ('https://www.countries-ofthe-world.com/flags-normal/flag-of-' +
                        '-'.join(subline) + '.png')
                 country = Country(name=line[0], capital=line[1],
@@ -157,7 +155,7 @@ class Country(db.Model):
     @staticmethod
     def get_country_by_name(user, name):
         return Country.query.filter_by(name=name.upper(), user_id=user.id)
-
+    
     @staticmethod
     def get_country_by_id(id):
         return Country.query.filter_by(id=id, user_id=current_user.id)
@@ -172,6 +170,11 @@ class Country(db.Model):
     def get_all_used_countries():
         return Country.query.filter_by(available=False).order_by(
             Country.timestamp.desc())
+
+    @staticmethod
+    def get_all_countries():
+        return Country.query.filter_by(user_id=current_user.id).order_by(
+            Country.name)
 
     @staticmethod
     def count_available_countries():
@@ -221,6 +224,10 @@ class Post(db.Model):
     @staticmethod
     def get_all_posts():
         return Post.query.order_by(Post.timestamp.desc())
+
+    @staticmethod
+    def get_posts_by_country(country_id):
+        return Post.query.filter_by(country_id=country_id).order_by(Post.timestamp.desc())
 
     @staticmethod
     def get_posts_by_user(user):

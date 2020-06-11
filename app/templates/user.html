@@ -28,20 +28,14 @@
                 </p>
                 {% endif %}
             </td>
-            <td>
-                <div class="row">
-                <div class="col-md-4">
-                    {{ wtf.quick_form(search_form) }}
-                </div>
-                </div>
-            </td>
             {% if user == current_user %}
             <td>
-                <div class="row">
-                <div class="col-md-4">
-                    {{ wtf.quick_form(reset_form) }}
-                </div>
-                </div>
+                <p>
+                    <form action="" method="post">
+                        {{ form.hidden_tag() }}
+                        {{ form.submit(value='Reset', class_='btn btn-default') }}
+                    </form>
+                </p>
             </td>
             {% endif %}
         </td>

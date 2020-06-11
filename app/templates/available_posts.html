@@ -1,48 +1,57 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block app_content %}
     <h1>Available posts</h1>
     <hr>
     {% for country in available_posts %}
     <table>
-        <tr valign="top">
-            <td><p><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
-                width="125" height="75"></p>
-                <p>{{ country.name }}</p>
+        <tr valign="center">
+            <td>
+                <p><img src="{{ country.flag_url }}" alt="{{ country.name }}'s flag"
+                width="125" height="80"></p>
+                <p><center>{{ country.name }}</center></p>
             </td>
             <td>
-                <form action="" method="post">
-                    {{ form.hidden_tag() }}
-                    <p>
-                        What did you cook?<br>
-                        {{ form.recipe(cols=40, rows=1)}}<br>
-                    </p>
-                    <p>
-                        What did you use?<br>
-                        {{ form.ingredients(cols=40, rows=2)}}<br>
-                    </p>
-                    <p>
-                        How did you make it?!<br>
-                        {{ form.steps(cols=40, rows=3)}}<br>
-                    </p>
-                        <style type="text/css">
-                        .hidden{
-                            display: none;
-                            }
-                        </style>
-                        <p class="hidden">
-                        {{ form.country_id(value=country.id) }}
-                        </p>
-                    <p>{{ form.submit() }}</p>
-                </form>
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                <p>
+                    <center>What did you cook?<br></center>
+                    {{ form.recipe(cols="40", rows="1", class_='btn btn-default') }}<br>
+                </p>
+                <p>
+                    <center>What did you use?<br></center>
+                    {{ form.ingredients(cols="40", rows="2", class_='btn btn-default') }}<br>
+                </p>
+                <p>
+                    <center>How did you make it?!<br></center>
+                    {{ form.steps(cols="40", rows="3", class_='btn btn-default') }}<br>
+                </p>
+                <style type="text/css">
+                    .hidden{
+                        display: none;
+                    }
+                </style>
+                <p class="hidden">
+                    {{ form.country_id(value=country.id) }}
+                </p>
+                <p><center>{{ form.submit(class_='btn btn-default') }}</center></p>
+            </form>
             </td>
         </tr>
     </table>
     {% endfor %}
-    {% if prev_url %}
-    <a href="{{ prev_url }}">Newer posts</a>
-    {% endif %}
-    {% if next_url %}
-    <a href="{{ next_url }}">Older posts</a>
-    {% endif %}
+    <nav aria-label="...">
+        <ul class="pager">
+            <li class="previous{% if not prev_url %} disabled{% endif %}">
+                <a href="{{ prev_url or '#' }}">
+                    <span aria-hidden="true">&larr;</span> Newer posts
+                </a>
+            </li>
+            <li class="next{% if not next_url %} disabled{% endif %}">
+                <a href="{{ next_url or '#' }}">
+                    Older posts <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 {% endblock %}

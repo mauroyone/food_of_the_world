@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
+from wtforms.widgets import TextArea
 from app.models import User
 
 class LoginForm(FlaskForm):
@@ -27,25 +28,25 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
-class PickCountryForm(FlaskForm):
-    pick_country = SubmitField('Wish me luck!')
+class IndexForm(FlaskForm):
+    pick_country_submit = SubmitField('Wish me luck!')
+    search_user_text = StringField('Searching for anybody in particular?',
+                       validators=[Length(min=0, max=40)])
+    search_user_submit = SubmitField('Search')
+    search_country_text = StringField('Which country are you interested in?',
+                                validators=[Length(min=0, max=40)])
+    search_country_submit = SubmitField('Search')
+    goto_available_posts_submit = SubmitField('Let\'s go')
+
 
 class SearchForm(FlaskForm):
     text = StringField('Search text',
                        validators=[DataRequired(), Length(min=0, max=40)])
     submit = SubmitField('Search')
 
-class SearchUserForm(FlaskForm):
-    searched_user = StringField('Who are you looking for?',
-                                validators=[DataRequired(), Length(min=0, max=40)])
-    submit = SubmitField('Search')
-
-class PostRecipeForm(FlaskForm):
-    submit = SubmitField('Let\'s go')
-
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
-    about_me = StringField('About me', validators=[Length(min=0, max=140)])
+    about_me = StringField('About me', validators=[Length(min=0, max=140)], widget=TextArea())
     submit = SubmitField('Submit')
 
     def __init__(self, original_username, *args, **kwargs):
@@ -63,11 +64,14 @@ class EmptyForm(FlaskForm):
 
 class RecipePostForm(FlaskForm):
     recipe = StringField('Recipe title',
-                         validators=[DataRequired(), Length(min=0, max=32)])
+                         validators=[DataRequired(), Length(min=0, max=32)],
+                         widget=TextArea())
     ingredients = StringField('Recipe ingredients',
-                              validators=[DataRequired(), Length(min=0, max=1024)])
+                              validators=[DataRequired(), Length(min=0, max=1024)],
+                              widget=TextArea())
     steps = StringField('Recipe steps',
-                        validators=[DataRequired(), Length(min=0, max=4096)])
+                        validators=[DataRequired(), Length(min=0, max=4096)],
+                        widget=TextArea())
     country_id = StringField('Country ID', validators=[DataRequired()])
     submit = SubmitField('Submit')
 

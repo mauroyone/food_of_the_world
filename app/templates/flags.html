@@ -1,0 +1,12 @@
+<h1>All flags</h1>
+
+{% for country in countries %}
+<table>
+    <tr valign="center">
+        <td><p><img src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
+            width="125" height="80"></p>
+            <p><center>{{ country.name }}</center></p>
+        </td>
+    </tr>
+</table>
+{% endfor %}

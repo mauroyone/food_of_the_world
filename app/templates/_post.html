@@ -6,27 +6,27 @@
             </a></p>
             <p><img src="{{ post.author.avatar(70) }}" /></p>
         </td>
-        <td>
+        <td width="70px">
             <p>A recipe from:</p>
             <p>{{ post.country_of_origin.name }}</p>
             <p><img src="{{ post.country_of_origin.flag_url}}"
                 alt="{{ post.country_of_origin.name }}'s flag"
-                width="125" height="75">
+                width="70" height="45">
             </p>
-            <td>
-                <p>
-                    Recipe:<br>
-                    {{ post.recipe }}
-                </p>
-                <p>
-                    Ingredients:<br>
-                    {{ post.ingredients }}
-                </p>
-                <p>
-                    Steps:<br>
-                    {{ post.steps }}
-                </p>
-            </td>
+        </td>
+        <td width="70px">
+            <p>
+                Recipe:<br>
+                {{ post.recipe }}
+            </p>
+            <p>
+                Ingredients:<br>
+                {{ post.ingredients }}
+            </p>
+            <p>
+                Steps:<br>
+                {{ post.steps }}
+            </p>
         </td>
     </tr>
 </table>
