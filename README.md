@@ -10,6 +10,21 @@ Why? To have fun!
 
 
 Features:
-  - User login
+  - User registration & login
   - DB connection
   - Different tables per user
+  - Pick a random country
+  - Post a recipe from an assigned country
+  - Follow/unfollow users
+  - Display recipes from followed users
+  - Check out all existing posts
+  - Search for particular users/countries
+  - Manual country selection
+  - Change password
+  - Edit own posts
+  
+  
+ To Do:
+  - Put some structure on the code. Blueprints
+  - Change the tables, only one table for all countries. Create another one for available posts
+  - (optional) try to put the styles in a css file 
