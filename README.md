@@ -22,9 +22,8 @@ Features:
   - Manual country selection
   - Change password
   - Edit own posts
-  
-  
+
+
  To Do:
   - Put some structure on the code. Blueprints
-  - Change the tables, only one table for all countries. Create another one for available posts
-  - (optional) try to put the styles in a css file 
+  - (optional) try to put the styles in a css file

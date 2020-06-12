@@ -20,10 +20,9 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(64))
-    countries = db.relationship('Country', backref='countries', lazy='dynamic')
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
     followed = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -90,36 +89,18 @@ class Country(db.Model):
     name = db.Column(db.String(32), index=True)
     capital = db.Column(db.String(32), index=True)
     flag_url = db.Column(db.String(128), index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    available = db.Column(db.Boolean, index=True, default=True)
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    posts = db.relationship('Post', backref='country_of_origin', lazy='dynamic')
-    post_available = db.Column(db.Boolean, index=True, default=False)
-
-    def set_available(self, value):
-        self.available = value
-
-    def set_post_available(self, value):
-        self.post_available = value
-
-    def set_time(self):
-        self.timestamp = datetime.utcnow()
-
-    def select_now(self):
-        self.available = False
-        self.post_available = True
-        db.session.commit()
+    posts = db.relationship('Post', backref='origin', lazy='dynamic')
 
     @staticmethod
     def delete_country_table():
-        countries = Country.query.filter_by(user_id=current_user.id).all()
+        countries = Country.query.all()
         for country in countries:
             db.session.delete(country)
         db.session.commit()
 
     @staticmethod
     def create_country_table():
-        Country.delete_country_table()
+        #Country.delete_country_table()
 
         with open('country_list.csv', encoding='utf8') as file:
             for line in file:
@@ -128,83 +109,71 @@ class Country(db.Model):
                 subline = line[2].split(' ')
                 url = ('https://www.countries-ofthe-world.com/flags-normal/flag-of-' +
                        '-'.join(subline) + '.png')
-                country = Country(name=line[0], capital=line[1],
-                                  flag_url=url, countries=current_user)
+                country = Country(name=line[0].upper(), capital=line[1],
+                                  flag_url=url)
                 db.session.add(country)
-                db.session.commit()
+            db.session.commit()
 
     @staticmethod
-    def get_available_country():
-        countries = Country.query.filter_by(available=True,
-                                            user_id=current_user.id).all()
-        if countries is None:
-            return
-        index = randint(0, len(countries)-1)
-        countries[index].set_available(False)
-        countries[index].set_post_available(True)
-        countries[index].set_time()
-        db.session.commit()
-        return countries[index]
-
-    @staticmethod
-    def get_user_used_countries(user):
-        return Country.query.filter_by(available=False,
-                                       user_id=user.id).order_by(
-                                           Country.timestamp.desc())
-
-    @staticmethod
-    def get_country_by_name(user, name):
-        return Country.query.filter_by(name=name.upper(), user_id=user.id)
-    
-    @staticmethod
-    def get_country_by_id(id):
-        return Country.query.filter_by(id=id, user_id=current_user.id)
-
-    @staticmethod
-    def get_countries_with_available_post():
-        return Country.query.filter_by(post_available=True,
-                                       user_id=current_user.id).order_by(
-                                           Country.timestamp.desc())
-
-    @staticmethod
-    def get_all_used_countries():
-        return Country.query.filter_by(available=False).order_by(
-            Country.timestamp.desc())
+    def get_country_by_name(name):
+        return Country.query.filter_by(name=name.upper())
 
     @staticmethod
     def get_all_countries():
-        return Country.query.filter_by(user_id=current_user.id).order_by(
-            Country.name)
+        return Country.query.order_by(Country.name)
 
     @staticmethod
-    def count_available_countries():
-        countries = Country.query.filter_by(available=True,
-                                            user_id=current_user.id).all()
-        if countries is None:
-            return 0
-        return len(countries)
+    def get_random_country(picked_countries):
+        available_countries = Country.query.filter(~Country.id.in_(picked_countries)).all()
+        index = randint(0, len(available_countries)-1)
+        return available_countries[index]
 
     @staticmethod
-    def count_available_posts():
-        posts = Country.query.filter_by(post_available=True,
-                                        user_id=current_user.id).all()
-        if posts is None:
-            return 0
-        return len(posts)
+    def count_countries():
+        return len(Country.query.all())
 
     def __repr__(self):
-        return 'Country {}'.format(self.name)
-
+        return 'Country: {}\nCapital: {}\n URL: {}\n'.format(self.name, self.capital,
+                                                             self.flag_url)
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    recipe = db.Column(db.String(32))
-    ingredients = db.Column(db.String(1024))
-    steps = db.Column(db.String(4096))
+    recipe = db.Column(db.String(32), default='')
+    ingredients = db.Column(db.String(1024), default='')
+    steps = db.Column(db.String(4096), default='')
+    submitted = db.Column(db.Boolean, index=True, default=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    #country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
-    country_name = db.Column(db.String(32), db.ForeignKey('country.name'))
+    country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
+
+    def set_submitted(self, value):
+        self.submitted = value
+
+    def submit(self, recipe, ingredients, steps):
+        self.recipe = recipe
+        self.ingredients = ingredients
+        self.steps = steps
+        self.submitted = True
+        self.timestamp = datetime.utcnow()
+
+        db.session.add(self)
+        db.session.commit()
+
+    def edit(self, recipe, ingredients, steps):
+        if self.recipe == recipe and self.ingredients == ingredients and self.steps == steps:
+            return None
+        self.recipe = recipe
+        self.ingredients = ingredients
+        self.steps = steps
+        self.timestamp = datetime.utcnow()
+        db.session.commit()
+        return 1
+
+    @staticmethod
+    def create_empty_post(country_id):
+        post = Post(user_id=current_user.id, country_id=country_id)
+        db.session.add(post)
+        db.session.commit()
 
     @staticmethod
     def delete_posts():
@@ -214,33 +183,54 @@ class Post(db.Model):
         db.session.commit()
 
     @staticmethod
-    def post_edit(recipe, ingredients, steps, country_name):
-        post = Post.query.filter_by(user_id=current_user.id,
-                                    country_name=country_name).first()
-        if post.recipe == recipe and post.ingredients == ingredients and post.steps == steps:
-            return None
-
-        post.recipe = recipe
-        post.ingredients = ingredients
-        post.steps = steps
-        post.timestamp = datetime.utcnow()
-        db.session.commit()
-        return 1
+    def get_post_by_id(id):
+        return Post.query.filter_by(id=id)
 
     @staticmethod
-    def get_all_posts():
-        return Post.query.order_by(Post.timestamp.desc())
+    def get_all_submitted_posts():
+        return Post.query.filter_by(submitted=True).order_by(Post.timestamp.desc())
 
     @staticmethod
-    def get_posts_by_country(country_name):
-        return Post.query.filter_by(country_name=country_name).order_by(Post.timestamp.desc())
+    def get_posts_by_country_id(country_id):
+        return Post.query.filter_by(submitted=True, country_id=country_id).order_by(
+            Post.timestamp.desc())
 
     @staticmethod
     def get_posts_by_user(user):
-        return Post.query.filter_by(user_id=user.id).order_by(
+        return Post.query.filter_by(submitted=True, user_id=user.id).order_by(
             Post.timestamp.desc())
 
+    @staticmethod
+    def get_available_posts_by_user(user):
+        return Post.query.filter_by(submitted=False, user_id=user.id).order_by(
+            Post.timestamp.desc())
+
+    @staticmethod
+    def get_countries_with_posts():
+        countries_with_posts = Post.query.filter_by(user_id=current_user.id).all()
+        return [picked_country.id for picked_country in countries_with_posts]
+
+    @staticmethod
+    def get_my_post_by_country(country_id):
+        return Post.query.filter_by(country_id=country_id, user_id=current_user.id)
+
+    @staticmethod
+    def count_different_countries_with_posts():
+        different_countries = Post.query.filter_by(user_id=current_user.id).distinct().all()
+        if different_countries is None:
+            return 0
+        return len(different_countries)
+
+    @staticmethod
+    def count_available_posts():
+        available_posts = Post.query.filter_by(submitted=False,
+                                               user_id=current_user.id).all()
+        if available_posts is None:
+            return 0
+        return len(available_posts)
+
     def __repr__(self):
-        return '<Post {}>'.format(self.steps)
+        return 'Author: {}\nCountry: {}\nRecipe: {}\n'.format(self.user_id,
+            self.country_id, self.recipe)
 
 

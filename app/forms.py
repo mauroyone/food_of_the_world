@@ -72,7 +72,7 @@ class RecipePostForm(FlaskForm):
     steps = StringField('Recipe steps',
                         validators=[DataRequired(), Length(min=0, max=4096)],
                         widget=TextArea())
-    country_name = StringField('Country name', validators=[DataRequired()])
+    post_id = StringField('Post ID', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 class ResetPasswordRequestForm(FlaskForm):
@@ -84,7 +84,3 @@ class ResetPasswordForm(FlaskForm):
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Request Password Reset')
-
-class SelectCountryForm(FlaskForm):
-    select = SubmitField('Give it a try?')
-    try_now = SubmitField('Try now!')

@@ -11,28 +11,18 @@
     <table>
         <tr valign="center">
             <td>
-                {% if has_data %}
-                    <p><img src="{{ post.country_of_origin.flag_url }}" 
-                        alt="{{ post.country_of_origin.name }}'s flag" width="125" height="80">
-                    </p>
-                    <p><center>{{ post.country_of_origin.name }}</center></p>
-                {% else %}
-                    <p><img src="{{ post.flag_url }}" alt="{{ post.name }}'s flag"
-                    width="125" height="80"></p>
-                    <p><center>{{ post.name }}</center></p>
-                {% endif %}
+                <p><img src="{{ post.origin.flag_url }}"
+                    alt="{{ post.origin.name }}'s flag" width="125" height="80">
+                </p>
+                <p><center>{{ post.origin.name }}</center></p>
             </td>
             <td>
             <form action="" method="post">
                 {{ form.hidden_tag() }}
-                {% if has_data %}
-                    {% set f = form.recipe.process_data(post.recipe) %}
-                    {% set f = form.ingredients.process_data(post.ingredients) %}
-                    {% set f = form.steps.process_data(post.steps) %}
-                    {% set f = form.country_name.process_data(post.country_of_origin.name) %}
-                {% else %}
-                    {% set f = form.country_name.process_data(post.name) %}
-                {% endif %} 
+                {% set f = form.recipe.process_data(post.recipe) %}
+                {% set f = form.ingredients.process_data(post.ingredients) %}
+                {% set f = form.steps.process_data(post.steps) %}
+                {% set f = form.post_id.process_data(post.id) %}
                 <p>
                     <center>What did you cook?<br></center>
                     {{ form.recipe(cols="40", rows="1", class_='btn btn-default') }}<br>
@@ -52,9 +42,9 @@
                 </style>
                 <p class="hidden">
                     {% if has_data %}
-                        {{ form.country_name() }}
+                        {{ form.post_id() }}
                     {% else %}
-                        {{ form.country_name() }}
+                        {{ form.post_id() }}
                     {% endif %}
                 </p>
                 <p><center>{{ form.submit(class_='btn btn-default') }}</center></p>

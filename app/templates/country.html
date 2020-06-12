@@ -17,24 +17,22 @@
             </td>
             <td>
             <center>
-                Did you know? {{ country.name }}'s capital city is: 
+                Did you know? {{ country.name }}'s capital city is:
                 {{ country.capital }}<br>
             </center>
             {% if user == current_user %}
-            {% if form %}
                 <form action="" method="post">
                 {{ form.hidden_tag() }}
-                    {% if country.available %}
+                    {% if try_now %}
                         <center>
-                            <p>{{ form.select(value='Give it a try?', class_='btn btn-default') }}</p>
+                            <p>{{ form.submit(value='Try now!', class_='btn btn-default') }}</p>
                         </center>
                     {% else %}
                         <center>
-                            <p>{{ form.try_now(value='Try now!', class_='btn btn-default') }}</p>
+                            <p>{{ form.submit(value='Give it a shot?', class_='btn btn-default') }}</p>
                         </center>
                     {% endif %}
                 </form>
-            {% endif %}
             {% endif %}
             </td>
         </tr>
