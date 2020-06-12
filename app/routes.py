@@ -269,7 +269,7 @@ def country(username, country):
         return redirect(url_for('available_posts'))
 
     page = request.args.get('page', 1, type=int)
-    posts = Post.get_posts_by_country(searched_country.id).paginate(
+    posts = Post.get_posts_by_country(searched_country.name).paginate(
         page, app.config['POSTS_PER_PAGE'], False)
     next_url = url_for('country', username=username, country=country, page=posts.next_num) \
         if posts.has_next else None
@@ -294,24 +294,25 @@ def available_posts():
     prev_url = url_for('available_posts', page=available_posts.prev_num) \
         if available_posts.has_prev else None
 
+    #if form.submit.data:
     if form.validate_on_submit():
-        country = Country.get_country_by_id(form.country_id.data).first()
+        flash(form.country_name.data)
+        country = Country.get_country_by_name(current_user, form.country_name.data).first()
         if country is None:
             flash('An unhandled error pop up')
             return redirect(url_for('index'))
         country.set_post_available(False)
-
         post = Post(recipe=form.recipe.data, ingredients=form.ingredients.data,
                     steps=form.steps.data, user_id=current_user.id,
-                    country_id=form.country_id.data)
+                    country_name=form.country_name.data)
         db.session.add(post)
         db.session.commit()
         flash('Your post is now alive!')
         return redirect(url_for('index'))
 
-    return render_template('available_posts.html', title='Available posts',
-                           form=form, available_posts=available_posts.items,
-                           next_url=next_url, prev_url=prev_url,)
+    return render_template('my_posts.html', title='Available posts',
+                           form=form, posts=available_posts.items,
+                           next_url=next_url, prev_url=prev_url, has_data=False)
 
 @app.route('/my_posts', methods=['GET', 'POST'])
 @login_required
@@ -327,12 +328,17 @@ def my_posts():
         if posts.has_prev else None
 
     if form.validate_on_submit():
-        Post.post_edit(form.recipe.data, form.ingredients.data, form.steps.data,
-                       form.country_id.data)
+        
+        if not Post.post_edit(form.recipe.data, form.ingredients.data, form.steps.data,
+                              form.country_name.data):
+            flash('No changes were made. Nothing to update')
+        else:
+            flash('Your post was updated')
+            return redirect(url_for('index'))
 
     return render_template('my_posts.html', title='My creations', form=form,
                            user=current_user, posts=posts.items,
-                           next_url=next_url, prev_url=prev_url)
+                           next_url=next_url, prev_url=prev_url, has_data=True)
 
 @app.route('/flags')
 @login_required

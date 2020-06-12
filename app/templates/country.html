@@ -1,39 +1,43 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-<link href="StyleSheet.css" rel="stylesheet">
     <h1>It's {{country.name}}!</h1>
     <hr>
     <table>
         <tr valign="center">
-            
-            <td><img class="border" src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
-                width="125" height="80"></td>
+            <td>
+                <style>
+                    .border{
+                        border-style: solid;
+                        border-width: 1px;
+                    }
+                </style>
+                <img class="border" src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
+                width="125" height="80">
+            </td>
             <td>
             <center>
-                Did you know? {{ country.name }}'s capital city is:<br>
-                {{ country.capital }}
+                Did you know? {{ country.name }}'s capital city is: 
+                {{ country.capital }}<br>
             </center>
+            {% if user == current_user %}
+            {% if form %}
+                <form action="" method="post">
+                {{ form.hidden_tag() }}
+                    {% if country.available %}
+                        <center>
+                            <p>{{ form.select(value='Give it a try?', class_='btn btn-default') }}</p>
+                        </center>
+                    {% else %}
+                        <center>
+                            <p>{{ form.try_now(value='Try now!', class_='btn btn-default') }}</p>
+                        </center>
+                    {% endif %}
+                </form>
+            {% endif %}
+            {% endif %}
             </td>
         </tr>
-        {% if user == current_user %}
-        {% if form %}
-            <form action="" method="post">
-            {{ form.hidden_tag() }}
-            <td>
-                {% if country.available %}
-                    <center>
-                        <p>{{ form.select(value='Give it a try?', class_='btn btn-default') }}</p>
-                    </center>
-                {% else %}
-                    <center>
-                        <p>{{ form.try_now(value='Try now!', class_='btn btn-default') }}</p>
-                    </center>
-                {% endif %}
-            </td>
-            </form>
-        {% endif %}
-        {% endif %}
     </table>
     <hr>
     <h2>Look what other users made</h2>

@@ -1,40 +1,64 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>Take a look at your creations:</h1>
+    {% if has_data %}
+        <h1>Take a look at your creations:</h1>
+    {% else %}
+        <h1>Available posts</h1>
+    {% endif %}
     <hr>
     {% for post in posts %}
     <table>
         <tr valign="center">
-            <td><p><img src="{{ post.country_of_origin.flag_url}}" alt="{{ post.country_of_origin.name }}'s flag"
-                width="125" height="80"></p>
-                <p><center>{{ post.country_of_origin.name }}</center></p>
+            <td>
+                {% if has_data %}
+                    <p><img src="{{ post.country_of_origin.flag_url }}" 
+                        alt="{{ post.country_of_origin.name }}'s flag" width="125" height="80">
+                    </p>
+                    <p><center>{{ post.country_of_origin.name }}</center></p>
+                {% else %}
+                    <p><img src="{{ post.flag_url }}" alt="{{ post.name }}'s flag"
+                    width="125" height="80"></p>
+                    <p><center>{{ post.name }}</center></p>
+                {% endif %}
             </td>
             <td>
-                <form action="" method="post">
-                    {{ form.hidden_tag() }}
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                {% if has_data %}
+                    {% set f = form.recipe.process_data(post.recipe) %}
+                    {% set f = form.ingredients.process_data(post.ingredients) %}
+                    {% set f = form.steps.process_data(post.steps) %}
+                    {% set f = form.country_name.process_data(post.country_of_origin.name) %}
+                {% else %}
+                    {% set f = form.country_name.process_data(post.name) %}
+                {% endif %} 
                 <p>
-                    Recipe:<br>
-                    {{ form.recipe(value=post.recipe, class_='btn btn-default') }}<br>
+                    <center>What did you cook?<br></center>
+                    {{ form.recipe(cols="40", rows="1", class_='btn btn-default') }}<br>
                 </p>
                 <p>
-                    Ingredients:<br>
-                    {{ form.ingredients(value=post.ingredients, class_='btn btn-default') }}<br>
+                    <center>What did you use?<br></center>
+                    {{ form.ingredients(cols="40", rows="2", class_='btn btn-default') }}<br>
                 </p>
                 <p>
-                    Steps:<br>
-                    {{ form.steps(value=post.steps, class_='btn btn-default') }}<br>
+                    <center>How did you make it?!<br></center>
+                    {{ form.steps(cols="40", rows="3", class_='btn btn-default') }}<br>
                 </p>
-                <style type="text/css">
+                <style>
                     .hidden{
-                        display: none;
-                        }
+                        visibility: hidden;
+                    }
                 </style>
                 <p class="hidden">
-                    {{ form.country_id(value=post.country_of_origin.id) }}
+                    {% if has_data %}
+                        {{ form.country_name() }}
+                    {% else %}
+                        {{ form.country_name() }}
+                    {% endif %}
                 </p>
-                <p><center>{{ form.submit(value='Edit', class_='btn btn-default') }}</center></p>
-                </form>
+                <p><center>{{ form.submit(class_='btn btn-default') }}</center></p>
+            </form>
             </td>
         </tr>
     </table>

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from wtforms.widgets import TextArea
 from app.models import User
@@ -31,10 +31,10 @@ class RegistrationForm(FlaskForm):
 class IndexForm(FlaskForm):
     pick_country_submit = SubmitField('Wish me luck!')
     search_user_text = StringField('Searching for anybody in particular?',
-                       validators=[Length(min=0, max=40)])
+                       validators=[Length(min=0, max=40)], widget=TextArea())
     search_user_submit = SubmitField('Search')
     search_country_text = StringField('Which country are you interested in?',
-                                validators=[Length(min=0, max=40)])
+                                validators=[Length(min=0, max=40)], widget=TextArea())
     search_country_submit = SubmitField('Search')
     goto_available_posts_submit = SubmitField('Let\'s go')
 
@@ -72,7 +72,7 @@ class RecipePostForm(FlaskForm):
     steps = StringField('Recipe steps',
                         validators=[DataRequired(), Length(min=0, max=4096)],
                         widget=TextArea())
-    country_id = StringField('Country ID', validators=[DataRequired()])
+    country_name = StringField('Country name', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
 class ResetPasswordRequestForm(FlaskForm):

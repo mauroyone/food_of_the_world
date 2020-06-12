@@ -5,14 +5,15 @@
                 {{ post.author.username }}
             </a></p>
             <p><img src="{{ post.author.avatar(70) }}" /></p>
+            <p>{{ moment(post.timestamp).format('LLL') }}</p>
         </td>
         <td width="70px">
             <p>A recipe from:</p>
-            <p>{{ post.country_of_origin.name }}</p>
             <p><img src="{{ post.country_of_origin.flag_url}}"
                 alt="{{ post.country_of_origin.name }}'s flag"
                 width="70" height="45">
             </p>
+            <p>{{ post.country_of_origin.name }}</p>
         </td>
         <td width="70px">
             <p>

@@ -203,7 +203,8 @@ class Post(db.Model):
     steps = db.Column(db.String(4096))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
+    #country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
+    country_name = db.Column(db.String(32), db.ForeignKey('country.name'))
 
     @staticmethod
     def delete_posts():
@@ -213,21 +214,26 @@ class Post(db.Model):
         db.session.commit()
 
     @staticmethod
-    def post_edit(recipe, ingredients, steps, country_id):
+    def post_edit(recipe, ingredients, steps, country_name):
         post = Post.query.filter_by(user_id=current_user.id,
-                                    country_id=country_id).first()
+                                    country_name=country_name).first()
+        if post.recipe == recipe and post.ingredients == ingredients and post.steps == steps:
+            return None
+
         post.recipe = recipe
         post.ingredients = ingredients
         post.steps = steps
+        post.timestamp = datetime.utcnow()
         db.session.commit()
+        return 1
 
     @staticmethod
     def get_all_posts():
         return Post.query.order_by(Post.timestamp.desc())
 
     @staticmethod
-    def get_posts_by_country(country_id):
-        return Post.query.filter_by(country_id=country_id).order_by(Post.timestamp.desc())
+    def get_posts_by_country(country_name):
+        return Post.query.filter_by(country_name=country_name).order_by(Post.timestamp.desc())
 
     @staticmethod
     def get_posts_by_user(user):

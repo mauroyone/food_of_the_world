@@ -23,7 +23,7 @@
                 </ul>
                 
                 {% if current_user.is_anonymous %}
-                <ul class="nav navbar-nav navbar-right"></ul>
+                <ul class="nav navbar-nav navbar-right">
                     <li><a href="{{ url_for('login') }}">Login</a></li>
                 </ul>
                 {% else %}
@@ -55,4 +55,9 @@
         {# application content needs to be provided in the app_content block #}
         {% block app_content %}{% endblock %}
     </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ moment.include_moment() }}
 {% endblock %}
