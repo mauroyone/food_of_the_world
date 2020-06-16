@@ -21,7 +21,7 @@
                     <li><a href="{{ url_for('index') }}">Home</a></li>
                     <li><a href="{{ url_for('explore') }}">Explore</a></li>
                 </ul>
-                
+
                 {% if current_user.is_anonymous %}
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="{{ url_for('login') }}">Login</a></li>
@@ -36,8 +36,8 @@
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                 </ul>
                 {% endif %}
-            
             </div>
+
         </div>
     </nav>
 {% endblock %}

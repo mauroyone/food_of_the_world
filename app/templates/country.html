@@ -12,8 +12,8 @@
                         border-width: 1px;
                     }
                 </style>
-                <img class="border" src="{{ country.flag_url}}" alt="{{ country.name }}'s flag"
-                width="125" height="80">
+                <img class="border" src="{{ country.flag_url}}"
+                alt="{{ country.name }}'s flag" width="125" height="80">
             </td>
             <td>
             <center>
@@ -25,11 +25,13 @@
                 {{ form.hidden_tag() }}
                     {% if try_now %}
                         <center>
-                            <p>{{ form.submit(value='Try now!', class_='btn btn-default') }}</p>
+                            <p>{{ form.submit(value='Try now!',
+                                class_='btn btn-default') }}</p>
                         </center>
                     {% else %}
                         <center>
-                            <p>{{ form.submit(value='Give it a shot?', class_='btn btn-default') }}</p>
+                            <p>{{ form.submit(value='Give it a shot?',
+                                class_='btn btn-default') }}</p>
                         </center>
                     {% endif %}
                 </form>
@@ -38,7 +40,7 @@
         </tr>
     </table>
     <hr>
-    <h2>Look what other users made</h2>
+    <h2>Look what other users have made</h2>
     {% for post in posts %}
         {% include '_post.html' %}
     {% endfor %}

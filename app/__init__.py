@@ -19,6 +19,3 @@ moment = Moment(app)
 
 from app import routes, models, errors
 from app.models import Country
-
-if len(Country.query.all()) == 0:
-    Country.create_country_table()
