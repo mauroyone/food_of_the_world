@@ -19,7 +19,7 @@ Features:
   - Display recipes from followed users
   - Check out all existing posts
   - Search for particular users/countries
-  - Manual country selection
+  - Manual country selection & check out all recipes from it
   - Change password
   - Edit own posts
 

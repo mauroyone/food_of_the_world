@@ -2,8 +2,7 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, current_app
 from flask_login import current_user, login_required
 from app import db
-from app.main.forms import IndexForm, SearchForm, EditProfileForm, \
-    EmptyForm, RecipePostForm
+from app.main.forms import IndexForm, SearchForm, EditProfileForm, FollowForm
 from app.models import User, Country, Post
 from app.main import bp
 
@@ -43,7 +42,7 @@ def index():
         picked_countries = Post.get_my_countries_with_posts()
         country = Country.get_random_country(picked_countries)
         Post.create_empty_post(country.id)
-        return redirect(url_for('main.country', username=current_user.username,
+        return redirect(url_for('recipes.country', username=current_user.username,
                                 country=country.name))
     if form.search_user_submit.data:
         form_data = form.search_user_text.data
@@ -62,10 +61,10 @@ def index():
             return redirect(url_for('main.index'))
         else:
             flash('Yeah! you searched for {}'.format(form_data))
-            return redirect(url_for('main.country', username=current_user.username,
+            return redirect(url_for('recipes.country', username=current_user.username,
                                     country=country.name))
     if form.goto_available_posts_submit.data:
-        return redirect(url_for('main.available_posts'))
+        return redirect(url_for('recipes.available_posts'))
 
     return render_template('index.html', title='Home', posts=posts.items, next_url=next_url,
                            prev_url=prev_url, form=form,
@@ -89,7 +88,7 @@ def explore():
 @bp.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
-    form = EmptyForm()
+    form = FollowForm()
 
     user = User.get_user_by_username(username).first()
     if user is None:
@@ -127,11 +126,10 @@ def edit_profile():
     return render_template('edit_profile.html', title='Edit Profile',
                            form=form)
 
-
 @bp.route('/follow/<username>', methods=['POST'])
 @login_required
 def follow(username):
-    form = EmptyForm()
+    form = FollowForm()
     if form.validate_on_submit():
         user = User.get_user_by_username(username).first()
         if user is None:
@@ -147,11 +145,10 @@ def follow(username):
     else:
         return redirect(url_for('main.index'))
 
-
 @bp.route('/unfollow/<username>', methods=['POST'])
 @login_required
 def unfollow(username):
-    form = EmptyForm()
+    form = FollowForm()
     if form.validate_on_submit():
         user = User.get_user_by_username(username).first()
         if user is None:
@@ -166,99 +163,6 @@ def unfollow(username):
         return redirect(url_for('main.explore', username=username))
     else:
         return redirect(url_for('main.index'))
-
-
-@bp.route('/user/<username>/country/<country>', methods=['GET', 'POST'])
-@login_required
-def country(username, country):
-    form = EmptyForm()
-
-    user = User.get_user_by_username(username).first()
-    if user is None:
-        flash('User {} not found.'.format(username))
-        return redirect(url_for('main.index'))
-
-    searched_country = Country.get_country_by_name(country).first()
-    if searched_country is None:
-        flash('Country {} not found.'.format(country))
-        return redirect(url_for('main.index'))
-
-    post = Post.get_my_post_by_country(searched_country.id).first()
-    try_now = False if post is None else True
-
-    if form.submit.data:
-        if not try_now:
-            Post.create_empty_post(searched_country.id)
-            flash('manual selection')
-        return redirect(url_for('main.available_posts'))
-
-    page = request.args.get('page', 1, type=int)
-    posts = Post.get_posts_by_country_id(searched_country.id).paginate(
-        page, current_app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('main.country', username=username, country=country, page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('main.country', username=username, country=country, page=posts.prev_num) \
-        if posts.has_prev else None
-
-
-    return render_template('country.html', title='Your country', posts=posts.items,
-                           country=searched_country, user=user, form=form,
-                           next_url=next_url, prev_url=prev_url, try_now=try_now)
-
-@bp.route('/available_posts', methods=['GET', 'POST'])
-@login_required
-def available_posts():
-    form = RecipePostForm()
-
-    page = request.args.get('page', 1, type=int)
-    available_posts = Post.get_my_available_posts().paginate(
-        page, current_app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('main.available_posts', page=available_posts.next_num) \
-        if available_posts.has_next else None
-    prev_url = url_for('main.available_posts', page=available_posts.prev_num) \
-        if available_posts.has_prev else None
-
-    if form.validate_on_submit():
-        post = Post.get_post_by_id(form.post_id.data).first()
-        if post is None:
-            flash('An unhandled error pop up')
-            return redirect(url_for('main.index'))
-        post.submit(recipe=form.recipe.data, ingredients=form.ingredients.data,
-                    steps=form.steps.data)
-        flash('Your post is now alive!')
-        return redirect(url_for('main.index'))
-
-    return render_template('my_posts.html', title='Available posts',
-                           form=form, posts=available_posts.items,
-                           next_url=next_url, prev_url=prev_url, has_data=False)
-
-@bp.route('/my_posts', methods=['GET', 'POST'])
-@login_required
-def my_posts():
-    form = RecipePostForm()
-
-    page = request.args.get('page', 1, type=int)
-    posts = Post.get_posts_by_user(current_user).paginate(
-        page, current_app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('main.my_posts', page=posts.next_num) \
-        if posts.has_next else None
-    prev_url = url_for('main.my_posts', page=posts.prev_num) \
-        if posts.has_prev else None
-
-    if form.validate_on_submit():
-        post = Post.get_post_by_id(form.post_id.data).first()
-        if post is None:
-            flash('An error!')
-
-        if not post.edit(form.recipe.data, form.ingredients.data, form.steps.data):
-            flash('No changes were made. Nothing to update')
-        else:
-            flash('Your post was updated')
-            return redirect(url_for('main.index'))
-
-    return render_template('my_posts.html', title='My creations', form=form,
-                           user=current_user, posts=posts.items,
-                           next_url=next_url, prev_url=prev_url, has_data=True)
 
 @bp.route('/flags')
 @login_required

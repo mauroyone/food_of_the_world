@@ -4,6 +4,7 @@ from datetime import datetime
 from hashlib import md5
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app
 from flask_login import UserMixin, current_user
 from app import db, login
 
@@ -55,13 +56,14 @@ class User(UserMixin, db.Model):
     def followed_posts(self):
         return Post.query.join(followers,
                                (followers.c.followed_id == Post.user_id)).filter(
-                                   followers.c.follower_id == self.id, Post.submitted == True).order_by(
+                                   followers.c.follower_id == self.id,
+                                   Post.submitted == True).order_by(
                                        Post.timestamp.desc())
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -74,7 +76,7 @@ class User(UserMixin, db.Model):
 
     @staticmethod
     def get_user_by_username(username):
-        return User.query.filter_by(username=username)
+        return User.query.filter_by(username=username.capitalize())
 
     @staticmethod
     def get_user_by_email(email):
@@ -123,7 +125,8 @@ class Country(db.Model):
 
     @staticmethod
     def get_random_country(picked_countries):
-        available_countries = Country.query.filter(~Country.id.in_(picked_countries)).all()
+        available_countries = Country.query.filter(
+            ~Country.id.in_(picked_countries)).all()
         index = randint(0, len(available_countries)-1)
         return available_countries[index]
 
@@ -159,7 +162,8 @@ class Post(db.Model):
         db.session.commit()
 
     def edit(self, recipe, ingredients, steps):
-        if self.recipe == recipe and self.ingredients == ingredients and self.steps == steps:
+        if (self.recipe == recipe and self.ingredients == ingredients
+                and self.steps == steps):
             return None
         self.recipe = recipe
         self.ingredients = ingredients
@@ -201,8 +205,9 @@ class Post(db.Model):
 
     @staticmethod
     def get_my_available_posts():
-        return Post.query.filter_by(submitted=False, user_id=current_user.id).order_by(
-            Post.timestamp.desc())
+        return Post.query.filter_by(submitted=False,
+                                    user_id=current_user.id).order_by(
+                                        Post.timestamp.desc())
 
     @staticmethod
     def get_my_countries_with_posts():
@@ -215,7 +220,8 @@ class Post(db.Model):
 
     @staticmethod
     def count_different_countries_with_posts():
-        different_countries = Post.query.filter_by(user_id=current_user.id).distinct().all()
+        different_countries = Post.query.filter_by(
+            user_id=current_user.id).distinct().all()
         if different_countries is None:
             return 0
         return len(different_countries)
@@ -230,4 +236,5 @@ class Post(db.Model):
 
     def __repr__(self):
         return 'Author: {}\nCountry: {}\nRecipe: {}\n'.format(self.user_id,
-                                                              self.country_id, self.recipe)
+                                                              self.country_id,
+                                                              self.recipe)
