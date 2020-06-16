@@ -5,7 +5,7 @@ from hashlib import md5
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, current_user
-from app import app, db, login
+from app import db, login
 
 @login.user_loader
 def load_user(id):
@@ -55,7 +55,7 @@ class User(UserMixin, db.Model):
     def followed_posts(self):
         return Post.query.join(followers,
                                (followers.c.followed_id == Post.user_id)).filter(
-                                   followers.c.follower_id == self.id).order_by(
+                                   followers.c.follower_id == self.id, Post.submitted == True).order_by(
                                        Post.timestamp.desc())
 
     def get_reset_password_token(self, expires_in=600):
@@ -100,7 +100,6 @@ class Country(db.Model):
 
     @staticmethod
     def create_country_table():
-        #Country.delete_country_table()
 
         with open('country_list.csv', encoding='utf8') as file:
             for line in file:
@@ -201,12 +200,12 @@ class Post(db.Model):
             Post.timestamp.desc())
 
     @staticmethod
-    def get_available_posts_by_user(user):
-        return Post.query.filter_by(submitted=False, user_id=user.id).order_by(
+    def get_my_available_posts():
+        return Post.query.filter_by(submitted=False, user_id=current_user.id).order_by(
             Post.timestamp.desc())
 
     @staticmethod
-    def get_countries_with_posts():
+    def get_my_countries_with_posts():
         countries_with_posts = Post.query.filter_by(user_id=current_user.id).all()
         return [picked_country.id for picked_country in countries_with_posts]
 
@@ -231,6 +230,4 @@ class Post(db.Model):
 
     def __repr__(self):
         return 'Author: {}\nCountry: {}\nRecipe: {}\n'.format(self.user_id,
-            self.country_id, self.recipe)
-
-
+                                                              self.country_id, self.recipe)

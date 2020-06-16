@@ -25,15 +25,18 @@
                 {% set f = form.post_id.process_data(post.id) %}
                 <p>
                     <center>What did you cook?<br></center>
-                    {{ form.recipe(cols="40", rows="1", class_='btn btn-default') }}<br>
+                    {{ form.recipe(cols="40", rows="1",
+                    class_='btn btn-default') }}<br>
                 </p>
                 <p>
                     <center>What did you use?<br></center>
-                    {{ form.ingredients(cols="40", rows="2", class_='btn btn-default') }}<br>
+                    {{ form.ingredients(cols="40", rows="2",
+                    class_='btn btn-default') }}<br>
                 </p>
                 <p>
                     <center>How did you make it?!<br></center>
-                    {{ form.steps(cols="40", rows="3", class_='btn btn-default') }}<br>
+                    {{ form.steps(cols="40", rows="3",
+                    class_='btn btn-default') }}<br>
                 </p>
                 <style>
                     .hidden{
