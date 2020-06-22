@@ -25,5 +25,4 @@ Features:
 
 
  To Do:
-  - Put some structure on the code. Blueprints
-  - (optional) try to put the styles in a css file
+  - Get recommendations for typical dishes!
