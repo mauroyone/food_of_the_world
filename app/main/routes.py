@@ -30,7 +30,6 @@ def index():
         if posts.has_next else None
     prev_url = url_for('main.index', page=posts.prev_num) \
         if posts.has_prev else None
-
     
     if form.validate_on_submit():
         button_clicked = request.form.get('submit button')

@@ -208,6 +208,12 @@ class Post(db.Model):
         return Post.query.filter_by(submitted=False,
                                     user_id=current_user.id).order_by(
                                         Post.timestamp.desc())
+    
+    @staticmethod
+    def get_my_available_posts_by_country(country_id):
+        return Post.query.filter_by(submitted=False, country_id=country_id,
+                                    user_id=current_user.id).order_by(
+                                        Post.timestamp.desc())
 
     @staticmethod
     def get_my_countries_with_posts():
@@ -215,8 +221,9 @@ class Post(db.Model):
         return [picked_country.id for picked_country in countries_with_posts]
 
     @staticmethod
-    def get_my_post_by_country(country_id):
-        return Post.query.filter_by(country_id=country_id, user_id=current_user.id)
+    def get_posts_by_user_country(user_id, country_id):
+        return Post.query.filter_by(submitted=True, user_id=user_id,
+                                    country_id=country_id).order_by(Post.timestamp.desc())
 
     @staticmethod
     def count_different_countries_with_posts():
