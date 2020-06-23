@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, current_app
 from flask_login import current_user, login_required
 from app import db
-from app.main.forms import IndexForm, SearchForm, EditProfileForm, FollowForm
+from app.main.forms import IndexForm, EditProfileForm, FollowForm
 from app.models import User, Country, Post
 from app.main import bp
 
@@ -31,40 +31,46 @@ def index():
     prev_url = url_for('main.index', page=posts.prev_num) \
         if posts.has_prev else None
 
+    
+    if form.validate_on_submit():
+        button_clicked = request.form.get('submit button')
+        
+        if button_clicked == "go to available posts":
+            return redirect(url_for('recipes.available_posts'))
 
-    if form.pick_country_submit.data:
-        if amount_of_available_countries == 0:
-            flash('You don\'t have any left country to try.')
-            flash('Please search for that country you really want' +
-                  'o give another try.')
-            flash('Or, if you are brave enough, reset the whole list!')
-            return redirect(url_for('main.user', username=current_user.username))
-        picked_countries = Post.get_my_countries_with_posts()
-        country = Country.get_random_country(picked_countries)
-        Post.create_empty_post(country.id)
-        return redirect(url_for('recipes.country', username=current_user.username,
-                                country=country.name))
-    if form.search_user_submit.data:
-        form_data = form.search_user_text.data
-        user = User.get_user_by_username(form_data).first()
-        if user is None:
-            flash('User {} not found'.format(form_data))
-            return redirect(url_for('main.index'))
-        else:
-            flash('Yeah! you searched for {}'.format(form_data))
-            return redirect(url_for('main.user', username=user.username))
-    if form.search_country_submit.data:
-        form_data = form.search_country_text.data
-        country = Country.get_country_by_name(form_data).first()
-        if country is None:
-            flash('Country {} not found'.format(form_data))
-            return redirect(url_for('main.index'))
-        else:
-            flash('Yeah! you searched for {}'.format(form_data))
+        if button_clicked == "pick country":
+            if amount_of_available_countries == 0:
+                flash('You don\'t have any left country to try.')
+                flash('Please search for that country you really want' +
+                    'o give another try.')
+                flash('Or, if you are brave enough, reset the whole list!')
+                return redirect(url_for('main.user', username=current_user.username))
+            picked_countries = Post.get_my_countries_with_posts()
+            country = Country.get_random_country(picked_countries)
+            Post.create_empty_post(country.id)
             return redirect(url_for('recipes.country', username=current_user.username,
                                     country=country.name))
-    if form.goto_available_posts_submit.data:
-        return redirect(url_for('recipes.available_posts'))
+
+        if button_clicked == "search user":    
+            form_data = form.search_user_text.data
+            user = User.get_user_by_username(form_data).first()
+            if user is None:
+                flash('User {} not found'.format(form_data))
+                return redirect(url_for('main.index'))
+            else:
+                flash('Yeah! you searched for {}'.format(form_data))
+                return redirect(url_for('main.user', username=user.username))
+
+        if button_clicked == "search country":
+            form_data = form.search_country_text.data
+            country = Country.get_country_by_name(form_data).first()
+            if country is None:
+                flash('Country {} not found'.format(form_data))
+                return redirect(url_for('main.index'))
+            else:
+                flash('Yeah! you searched for {}'.format(form_data))
+                return redirect(url_for('recipes.country', username=current_user.username,
+                                        country=country.name))
 
     return render_template('index.html', title='Home', posts=posts.items, next_url=next_url,
                            prev_url=prev_url, form=form,

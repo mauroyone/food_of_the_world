@@ -1,27 +1,18 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Length
-from wtforms.widgets import TextArea
+from wtforms.widgets import TextArea, TextInput
 from app.models import User
 
 
 class IndexForm(FlaskForm):
-    pick_country_submit = SubmitField('Wish me luck!')
     search_user_text = StringField('Searching for anybody in particular?',
                                    validators=[Length(min=0, max=40)],
-                                   widget=TextArea())
-    search_user_submit = SubmitField('Search')
+                                   widget=TextInput())
     search_country_text = StringField('Which country are you interested in?',
                                       validators=[Length(min=0, max=40)],
-                                      widget=TextArea())
-    search_country_submit = SubmitField('Search')
-    goto_available_posts_submit = SubmitField('Let\'s go')
-
-
-class SearchForm(FlaskForm):
-    text = StringField('Search text',
-                       validators=[DataRequired(), Length(min=0, max=40)])
-    submit = SubmitField('Search')
+                                      widget=TextInput())
+    submit = SubmitField('Submit')
 
 class EditProfileForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
