@@ -4,9 +4,9 @@ from wtforms.validators import ValidationError, DataRequired, Length
 from wtforms.widgets import TextArea
 
 
-class SelectCountryForm(FlaskForm):
-    search_country_text = StringField('Looking for a particular country?',
-                                      validators=[Length(min=0, max=40)])
+class SearchForm(FlaskForm):
+    search_text = StringField('Looking for a particular country?',
+                              validators=[Length(min=0, max=40)])
     submit = SubmitField('Submit')
 
 class RecipePostForm(FlaskForm):
