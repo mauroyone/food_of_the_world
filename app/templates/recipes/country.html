@@ -23,27 +23,52 @@
             {% if user == current_user %}
                 <form action="" method="post">
                 {{ form.hidden_tag() }}
-                    {% if try_now %}
-                        <center>
-                            <p>{{ form.submit(value='Try now!',
-                                class_='btn btn-default') }}</p>
-                        </center>
+                    {% if already_picked %}
+                        <center><p>
+                            <input type="hidden" name="submit button",
+                            value="select country">
+                            {{ form.submit(value='Try now!',
+                            class_='btn btn-default') }}
+                        </p></center>
                     {% else %}
-                        <center>
-                            <p>{{ form.submit(value='Give it a shot?',
-                                class_='btn btn-default') }}</p>
-                        </center>
+                        <center><p>
+                            <input type="hidden" name="submit button",
+                            value="select country">
+                            {{ form.submit(value='Give it a shot?',
+                            class_='btn btn-default') }}
+                        </p></center>
                     {% endif %}
                 </form>
             {% endif %}
             </td>
-        </tr>
+            <td>
+                <form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    Looking for anybody's creation? <br>
+                    {{ form.search_text(cols="20", rows="1", class_='btn btn-default') }}
+                    <input type="hidden" name="submit button", value="search user">
+                    {{ form.submit(value="Search user", class_='btn btn-default') }}
+                </form></td>
+                <td><form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    Search for another country? <br>
+                    {{ form.search_text(cols="20", rows="1", class_='btn btn-default') }}
+                    <input type="hidden" name="submit button", value="search country">
+                    {{ form.submit(value="Search country", class_='btn btn-default') }}
+                </form>
+            </td>
     </table>
     <hr>
+    {% if posts %}
     <h2>Look what other users have made</h2>
     {% for post in posts %}
         {% include '_post.html' %}
     {% endfor %}
+    {% else %}
+    <center>
+        <h2>It seems {{ user.username }} hasn't cooked anything from this country</h2>
+    </center>
+    {% endif %}
     <nav aria-label="...">
         <ul class="pager">
             <li class="previous{% if not prev_url %} disabled{% endif %}">

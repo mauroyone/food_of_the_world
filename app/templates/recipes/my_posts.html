@@ -9,13 +9,14 @@
     {% if search_country_form %}
     <form action="" method="post">
         {{ search_country_form.hidden_tag() }}
-        {{ search_country_form.search_country_text.label }} <br>
-        {{ search_country_form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
-        <input type="hidden" name="submit button", value="search country"> 
+        {{ search_country_form.search_text.label }} <br>
+        {{ search_country_form.search_text(cols="20", rows="1", class_='btn btn-default') }}
+        <input type="hidden" name="submit button", value="search country">
         {{ search_country_form.submit(value="Search country", class_='btn btn-default') }}
     </form>
     {% endif %}
     <hr>
+    {% if posts %}
     {% for post in posts %}
     <table>
         <tr valign="center">
@@ -53,18 +54,32 @@
                     }
                 </style>
                 <p class="hidden">
-                    {% if has_data %}
-                        {{ form.post_id() }}
-                    {% else %}
-                        {{ form.post_id() }}
-                    {% endif %}
+                    {{ form.post_id() }}
                 </p>
+                <input type="hidden" name="submit button", value="submit recipe">
                 <p><center>{{ form.submit(class_='btn btn-default') }}</center></p>
             </form>
             </td>
         </tr>
     </table>
     {% endfor %}
+    {% else %}
+    <center>
+        {% if general %}
+            {% if has_data %}
+                <h2>It seems you haven't add any recipe yet</h2>
+            {% else %}
+                <h2>It seems you don't have any available recipe</h2>
+            {% endif %}
+        {% else %}
+            {% if has_data %}
+                <h2>It seems you haven't cooked anything from this country</h2>
+            {% else %}
+                <h2>It seems you don't have any available recipe for this country</h2>
+            {% endif %}
+        {% endif %}
+    </center>
+    {% endif %}
     <nav aria-label="...">
         <ul class="pager">
             <li class="previous{% if not prev_url %} disabled{% endif %}">
