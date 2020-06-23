@@ -12,33 +12,35 @@
             <p>You have a total of {{ amount_of_available_posts }}
                 to submit.</p>
         </td>
-        <form action="" method="post">
-        <td>
-        <center>
+        <td><form action="" method="post"><center>
             <p>A new adventure is about to begin<p>
             {{ form.hidden_tag() }}
-            {{ form.pick_country_submit(class_='btn btn-default') }}
-        </center>
-        </td>
-        <td>
-        <center>
+            <input type="hidden" name="submit button", value="pick country">
+            {{ form.submit(value="Wish me luck!", class_='btn btn-default') }}
+            
+        </center></form></td>
+        <td><form action="" method="post"><center>
             <p>Share your creations<p>
-            {{ form.goto_available_posts_submit(class_='btn btn-default') }}
-        </center>
-        </td>
+            {{ form.hidden_tag() }}
+            <input type="hidden" name="submit button", value="go to available posts"> 
+            {{ form.submit(value="Let's go", class_='btn btn-default') }}
+        </center></form></td>
     </tr>
     <tr>
-        <td>
-            {{ form.search_user_text.label }}<br>
+        <td><form action="" method="post">
+            {{ form.hidden_tag() }}
+            {{ form.search_user_text.label }} <br>
             {{ form.search_user_text(cols="20", rows="1", class_='btn btn-default') }}
-            {{ form.search_user_submit(class_='btn btn-default') }}
-        </td>
-        <td>
-            {{ form.search_country_text.label }}<br>
+            <input type="hidden" name="submit button", value="search user"> 
+            {{ form.submit(value="Search user", class_='btn btn-default') }}
+        </form></td>
+        <td><form action="" method="post">
+            {{ form.hidden_tag() }}
+            {{ form.search_country_text.label }} <br>
             {{ form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
-            {{ form.search_country_submit(class_='btn btn-default') }}
-        </td>
-        </form>
+            <input type="hidden" name="submit button", value="search country"> 
+            {{ form.submit(value="Search country", class_='btn btn-default') }}
+        </form></td>
         {% endif %}
     </tr>
     </table>
