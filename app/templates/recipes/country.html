@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>It's {{country.name}}!</h1>
+    <h1>{{country.name}}</h1>
     <hr>
     <table>
         <tr valign="center">
@@ -17,29 +17,28 @@
             </td>
             <td>
             <center>
-                Did you know? {{ country.name }}'s capital city is:
+                Did you know? <br>
+                {{ country.name }}'s capital city is:
                 {{ country.capital }}<br>
             </center>
-            {% if user == current_user %}
-                <form action="" method="post">
-                {{ form.hidden_tag() }}
-                    {% if already_picked %}
-                        <center><p>
-                            <input type="hidden" name="submit button",
-                            value="select country">
-                            {{ form.submit(value='Try now!',
-                            class_='btn btn-default') }}
-                        </p></center>
-                    {% else %}
-                        <center><p>
-                            <input type="hidden" name="submit button",
-                            value="select country">
-                            {{ form.submit(value='Give it a shot?',
-                            class_='btn btn-default') }}
-                        </p></center>
-                    {% endif %}
-                </form>
-            {% endif %}
+            <form action="" method="post">
+            {{ form.hidden_tag() }}
+                {% if already_picked %}
+                    <center><p>
+                        <input type="hidden" name="submit button",
+                        value="select country">
+                        {{ form.submit(value='Try now!',
+                        class_='btn btn-default') }}
+                    </p></center>
+                {% else %}
+                    <center><p>
+                        <input type="hidden" name="submit button",
+                        value="select country">
+                        {{ form.submit(value='Give it a shot?',
+                        class_='btn btn-default') }}
+                    </p></center>
+                {% endif %}
+            </form>
             </td>
             <td>
                 <form action="" method="post">
@@ -60,14 +59,14 @@
     </table>
     <hr>
     {% if posts %}
-    <h2>Look what other users have made</h2>
-    {% for post in posts %}
-        {% include '_post.html' %}
-    {% endfor %}
+        <h2>Look what other users have made:</h2>
+        {% for post in posts %}
+            {% include '_post.html' %}
+        {% endfor %}
     {% else %}
-    <center>
-        <h2>It seems {{ user.username }} hasn't cooked anything from this country</h2>
-    </center>
+        <center>
+        <h2>It seems nobody has posted a recipe from {{ country.name }}. Be the first one!</h2>
+        </center>
     {% endif %}
     <nav aria-label="...">
         <ul class="pager">

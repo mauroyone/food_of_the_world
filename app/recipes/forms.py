@@ -6,7 +6,7 @@ from wtforms.widgets import TextArea
 
 class SearchForm(FlaskForm):
     search_text = StringField('Looking for a particular country?',
-                              validators=[Length(min=0, max=40)])
+                              validators=[DataRequired(), Length(min=0, max=40)])
     submit = SubmitField('Submit')
 
 class RecipePostForm(FlaskForm):

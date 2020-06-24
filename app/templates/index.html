@@ -5,7 +5,7 @@
     <h1>Hi, {{ current_user.username }}!</h1>
     <table>
     <tr valign="top">
-        {% if form %}
+        {% if index %}
         <td>
             <p>You have a total of {{ amount_of_available_countries }}
                 countries yet to taste!</p>
@@ -25,6 +25,7 @@
             <input type="hidden" name="submit button", value="go to available posts"> 
             {{ form.submit(value="Let's go", class_='btn btn-default') }}
         </center></form></td>
+        {% endif %}
     </tr>
     <tr>
         <td><form action="" method="post">
@@ -41,7 +42,6 @@
             <input type="hidden" name="submit button", value="search country"> 
             {{ form.submit(value="Search country", class_='btn btn-default') }}
         </form></td>
-        {% endif %}
     </tr>
     </table>
     <hr>
