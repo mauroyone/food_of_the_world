@@ -43,15 +43,15 @@
             <td>
                 <form action="" method="post">
                     {{ form.hidden_tag() }}
-                    Looking for anybody's creation? <br>
-                    {{ form.search_text(cols="20", rows="1", class_='btn btn-default') }}
+                    {{ form.search_user_text.label }} <br>
+                    {{ form.search_user_text(cols="20", rows="1", class_='btn btn-default') }}
                     <input type="hidden" name="submit button", value="search user">
                     {{ form.submit(value="Search user", class_='btn btn-default') }}
                 </form></td>
                 <td><form action="" method="post">
                     {{ form.hidden_tag() }}
-                    Search for another country? <br>
-                    {{ form.search_text(cols="20", rows="1", class_='btn btn-default') }}
+                    {{ form.search_country_text.label }} <br>
+                    {{ form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
                     <input type="hidden" name="submit button", value="search country">
                     {{ form.submit(value="Search country", class_='btn btn-default') }}
                 </form>
@@ -59,13 +59,21 @@
     </table>
     <hr>
     {% if posts %}
-        <h2>Look what other users have made:</h2>
+        {% if user %}
+            <h2>Look what {{ user.username }} has made:</h2>
+        {% else %}
+            <h2>Look what other users have made:</h2>
+        {% endif %}
         {% for post in posts %}
             {% include '_post.html' %}
         {% endfor %}
     {% else %}
         <center>
-        <h2>It seems nobody has posted a recipe from {{ country.name }}. Be the first one!</h2>
+        {% if user %}
+            <h2>It seems {{ user.username }} has not posted a recipe from {{ country.name }}</h2>
+        {% else %}
+            <h2>It seems nobody has posted a recipe from {{ country.name }}. Be the first one!</h2>
+        {% endif %}
         </center>
     {% endif %}
     <nav aria-label="...">

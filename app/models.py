@@ -221,6 +221,11 @@ class Post(db.Model):
         return [picked_country.id for picked_country in countries_with_posts]
 
     @staticmethod
+    def get_others_posts_by_country_id(country_id):
+        return Post.query.filter(Post.submitted and Post.user_id != current_user.id and 
+                                 Post.country_id == country_id).order_by(Post.timestamp.desc())
+
+    @staticmethod
     def get_posts_by_user_and_country_ids(user_id, country_id):
         return Post.query.filter_by(submitted=True, user_id=user_id,
                                     country_id=country_id).order_by(Post.timestamp.desc())

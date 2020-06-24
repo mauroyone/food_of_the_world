@@ -2,10 +2,9 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, current_app
 from flask_login import current_user, login_required
 from app import db
-from app.main.forms import IndexForm, EditProfileForm, FollowForm
+from app.main.forms import SearchForm, EditProfileForm, FollowForm
 from app.models import User, Country, Post
 from app.main import bp
-
 
 @bp.before_request
 def before_request():
@@ -17,7 +16,7 @@ def before_request():
 @bp.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    form = IndexForm()
+    form = SearchForm()
 
     amount_of_available_countries = (Country.count_countries() -
                                      Post.count_different_countries_with_posts())
@@ -38,36 +37,28 @@ def index():
             return redirect(url_for('recipes.available_posts'))
 
         if button_clicked == 'pick country':
-            if amount_of_available_countries == 0:
-                flash('You don\'t have any left country to try.')
-                flash('Please search for that country you really want' +
-                    'o give another try.')
-                flash('Or, if you are brave enough, reset the whole list!')
-                return redirect(url_for('main.user', username=current_user.username))
-            picked_countries = Post.get_my_countries_with_posts()
-            country = Country.get_random_country(picked_countries)
-            Post.create_empty_post(country.id)
-            return redirect(url_for('recipes.country', country_name=country.name))
-
+            if amount_of_available_countries:
+                picked_countries = Post.get_my_countries_with_posts()
+                country = Country.get_random_country(picked_countries)
+                Post.create_empty_post(country.id)
+                return redirect(url_for('recipes.country', country_name=country.name))
+            flash('You don\'t have any left country to try.')
+            flash('Please search for that country you really want' +
+                'o give another try.')
+            flash('Or, if you are brave enough, reset the whole list!')
+            return redirect(url_for('main.user', username=current_user.username))
+            
         if button_clicked == 'search user':    
-            form_data = form.search_user_text.data
-            user = User.get_user_by_username(form_data).first()
-            if user is None:
-                flash('User {} not found'.format(form_data))
-                return redirect(url_for('main.index'))
-            else:
-                flash('Yeah! you searched for {}'.format(form_data))
+            user = User.get_user_by_username(form.search_user_text.data).first()
+            if not user is None:
                 return redirect(url_for('main.user', username=user.username))
+            flash('User {} not found'.format(form.search_user_text.data))
 
         if button_clicked == 'search country':
-            form_data = form.search_country_text.data
-            country = Country.get_country_by_name(form_data).first()
-            if country is None:
-                flash('Country {} not found'.format(form_data))
-                return redirect(url_for('main.index'))
-            else:
-                flash('Yeah! you searched for {}'.format(form_data))
+            country = Country.get_country_by_name(form.search_country_text.data).first()
+            if not country is None:
                 return redirect(url_for('recipes.country', country_name=country.name))
+            flash('Country {} not found'.format(form.search_country_text.data))
 
     return render_template('index.html', title='Home', index=True, posts=posts.items,
                            next_url=next_url, prev_url=prev_url, form=form,
@@ -77,7 +68,7 @@ def index():
 @bp.route('/explore', methods=['GET', 'POST'])
 @login_required
 def explore():
-    form = IndexForm()
+    form = SearchForm()
 
     page = request.args.get('page', 1, type=int)
     posts = Post.get_all_submitted_posts().paginate(
@@ -91,24 +82,16 @@ def explore():
         button_clicked = request.form.get('submit button')
 
         if button_clicked == 'search user':    
-            form_data = form.search_user_text.data
-            user = User.get_user_by_username(form_data).first()
-            if user is None:
-                flash('User {} not found'.format(form_data))
-                return redirect(url_for('main.index'))
-            else:
-                flash('Yeah! you searched for {}'.format(form_data))
+            user = User.get_user_by_username(form.search_user_text.data).first()
+            if not user is None:
                 return redirect(url_for('main.user', username=user.username))
+            flash('User {} not found'.format(form.search_user_text.data))
 
         if button_clicked == 'search country':
-            form_data = form.search_country_text.data
-            country = Country.get_country_by_name(form_data).first()
-            if country is None:
-                flash('Country {} not found'.format(form_data))
-                return redirect(url_for('main.index'))
-            else:
-                flash('Yeah! you searched for {}'.format(form_data))
+            country = Country.get_country_by_name(form.search_country_text.data).first()
+            if not country is None:
                 return redirect(url_for('recipes.country', country_name=country.name))
+            flash('Country {} not found'.format(form.search_country_text.data))
 
     return render_template('index.html', title='Explore', posts=posts.items,
                            form=form, next_url=next_url, prev_url=prev_url)
@@ -116,7 +99,7 @@ def explore():
 @bp.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username):
-    form = FollowForm()
+    form = SearchForm()
 
     user = User.get_user_by_username(username).first()
     if user is None:
@@ -131,9 +114,25 @@ def user(username):
     prev_url = url_for('main.user', username=user.username, page=posts.prev_num) \
         if posts.has_prev else None
 
-    if form.validate_on_submit():
-        Post.delete_posts()
-        return redirect(url_for('main.index'))
+    if request.method == 'POST':
+        button_clicked = request.form.get('submit button')
+
+        if button_clicked == 'reset':
+            Post.delete_posts()
+            return redirect(url_for('main.index'))
+
+        if button_clicked == 'search user': 
+            user = User.get_user_by_username(form.search_user_text.data).first()
+            if not user is None:
+                return redirect(url_for('main.user', username=user.username))
+            flash('User {} not found'.format(form.search_user_text.data))
+
+        if button_clicked == 'search country':
+            country = Country.get_country_by_name(form.search_country_text.data).first()
+            if not country is None:
+                 return redirect(url_for('recipes.user_country', username=user.username,
+                                         country_name=country.name))
+            flash('Country {} not found'.format(form.search_country_text.data))
 
     return render_template('user.html', user=user, posts=posts.items, next_url=next_url,
                            prev_url=prev_url, form=form)
