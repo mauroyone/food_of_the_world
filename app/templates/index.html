@@ -3,47 +3,53 @@
 
 {% block app_content %}
     <h1>Hi, {{ current_user.username }}!</h1>
-    <table>
-    <tr valign="top">
-        {% if index %}
-        <td>
+    {% if index %}
+    <div class="row">
+        <div class="col-md-3">
             <p>You have a total of {{ amount_of_available_countries }}
-                countries yet to taste!</p>
+            countries yet to taste!</p>
             <p>You have a total of {{ amount_of_available_posts }}
-                to submit.</p>
-        </td>
-        <td><form action="" method="post"><center>
-            <p>A new adventure is about to begin<p>
-            {{ form.hidden_tag() }}
-            <input type="hidden" name="submit button", value="pick country">
-            {{ form.submit(value="Wish me luck!", class_='btn btn-default') }}
-            
-        </center></form></td>
-        <td><form action="" method="post"><center>
-            <p>Share your creations<p>
-            {{ form.hidden_tag() }}
-            <input type="hidden" name="submit button", value="go to available posts"> 
-            {{ form.submit(value="Let's go", class_='btn btn-default') }}
-        </center></form></td>
-        {% endif %}
-    </tr>
-    <tr>
-        <td><form action="" method="post">
-            {{ form.hidden_tag() }}
-            {{ form.search_user_text.label }} <br>
-            {{ form.search_user_text(cols="20", rows="1", class_='btn btn-default') }}
-            <input type="hidden" name="submit button", value="search user"> 
-            {{ form.submit(value="Search user", class_='btn btn-default') }}
-        </form></td>
-        <td><form action="" method="post">
-            {{ form.hidden_tag() }}
-            {{ form.search_country_text.label }} <br>
-            {{ form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
-            <input type="hidden" name="submit button", value="search country"> 
-            {{ form.submit(value="Search country", class_='btn btn-default') }}
-        </form></td>
-    </tr>
-    </table>
+            to submit.</p>
+        </div>
+        <div class="col-md-3">
+            <form action="" method="post">
+                <p>A new adventure is about to begin<p>
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="submit button", value="pick country">
+                {{ form.submit(value="Wish me luck!", class_='btn btn-default') }}
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form action="" method="post">
+                <p>Share your creations<p>
+                {{ form.hidden_tag() }}
+                <input type="hidden" name="submit button", value="go to available posts"> 
+                {{ form.submit(value="Let's go", class_='btn btn-default') }}
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row">
+        <div class="col-md-3">
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                {{ form.search_user_text.label }} <br>
+                {{ form.search_user_text(cols="20", rows="1", class_='btn btn-default') }}
+                <input type="hidden" name="submit button", value="search user"> 
+                {{ form.submit(value="Search user", class_='btn btn-default') }}
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                {{ form.search_country_text.label }} <br>
+                {{ form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
+                <input type="hidden" name="submit button", value="search country"> 
+                {{ form.submit(value="Search country", class_='btn btn-default') }}
+            </form>
+        </div>
+    </div>
+    
     <hr>
     {% for post in posts %}
         {% include '_post.html' %}

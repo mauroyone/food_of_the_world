@@ -48,23 +48,28 @@
             {% endif %}
         </td>
         </tr>
-        <tr>
-            <td><form action="" method="post">
+    </table>
+    <div class="row">
+        <div class="col-md-3">
+            <form action="" method="post">
                 {{ form.hidden_tag() }}
                 {{ form.search_user_text.label }} <br>
                 {{ form.search_user_text(cols="20", rows="1", class_='btn btn-default') }}
-                <input type="hidden" name="submit button", value="search user">
+                <input type="hidden" name="submit button", value="search user"> 
                 {{ form.submit(value="Search user", class_='btn btn-default') }}
-            </form></td>
-            <td><form action="" method="post">
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form action="" method="post">
                 {{ form.hidden_tag() }}
                 {{ form.search_country_text.label }} <br>
                 {{ form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
-                <input type="hidden" name="submit button", value="search country">
+                <input type="hidden" name="submit button", value="search country"> 
                 {{ form.submit(value="Search country", class_='btn btn-default') }}
-            </form></td>
-        </tr>
-    </table>
+            </form>
+        </div>
+    </div>
+    
 
     <hr>
     {% for post in posts %}

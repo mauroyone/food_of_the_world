@@ -7,62 +7,60 @@
         <h1>Available posts</h1>
     {% endif %}
     
-    {% if search_country_form %}
+    {% if search_form %}
     <form action="" method="post">
-        {{ search_country_form.hidden_tag() }}
-        {{ search_country_form.search_text.label }} <br>
-        {{ search_country_form.search_text(cols="20", rows="1", class_='btn btn-default') }}
+        {{ search_form.hidden_tag() }}
+        {{ search_form.search_country_text.label }} <br>
+        {{ search_form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
         <input type="hidden" name="submit button", value="search country">
-        {{ search_country_form.submit(value="Search country", class_='btn btn-default') }}
+        {{ search_form.submit(value="Search country", class_='btn btn-default') }}
     </form>
     {% endif %}
     <hr>
     {% if posts %}
     {% for post in posts %}
-    <table>
-        <tr valign="center">
-            <td>
-                <p><img src="{{ post.origin.flag_url }}"
-                    alt="{{ post.origin.name }}'s flag" width="125" height="80">
-                </p>
-                <p><center>{{ post.origin.name }}</center></p>
-            </td>
-            <td>
-            <form action="" method="post">
-                {{ form.hidden_tag() }}
-                {% set f = form.recipe.process_data(post.recipe) %}
-                {% set f = form.ingredients.process_data(post.ingredients) %}
-                {% set f = form.steps.process_data(post.steps) %}
-                {% set f = form.post_id.process_data(post.id) %}
-                <p>
-                    <center>What did you cook?<br></center>
-                    {{ form.recipe(cols="40", rows="1",
-                    class_='btn btn-default') }}<br>
-                </p>
-                <p>
-                    <center>What did you use?<br></center>
-                    {{ form.ingredients(cols="40", rows="2",
-                    class_='btn btn-default') }}<br>
-                </p>
-                <p>
-                    <center>How did you make it?!<br></center>
-                    {{ form.steps(cols="40", rows="3",
-                    class_='btn btn-default') }}<br>
-                </p>
-                <style>
-                    .hidden{
-                        visibility: hidden;
-                    }
-                </style>
-                <p class="hidden">
-                    {{ form.post_id() }}
-                </p>
-                <input type="hidden" name="submit button", value="submit recipe">
-                <p><center>{{ form.submit(class_='btn btn-default') }}</center></p>
-            </form>
-            </td>
-        </tr>
-    </table>
+    <div class="row">
+        <div class="col-md-3">
+            <p><img src="{{ post.origin.flag_url }}"
+                alt="{{ post.origin.name }}'s flag" width="125" height="80">
+            </p>
+            <p><center>{{ post.origin.name }}</center></p>
+        </div>
+        <div class="col-md-3">
+        <form action="" method="post">
+            {{ form.hidden_tag() }}
+            {% set f = form.recipe.process_data(post.recipe) %}
+            {% set f = form.ingredients.process_data(post.ingredients) %}
+            {% set f = form.steps.process_data(post.steps) %}
+            {% set f = form.post_id.process_data(post.id) %}
+            <p>
+                What did you cook?<br>
+                {{ form.recipe(cols="40", rows="1",
+                class_='btn btn-default') }}<br>
+            </p>
+            <p>
+                What did you use?<br>
+                {{ form.ingredients(cols="40", rows="2",
+                class_='btn btn-default') }}<br>
+            </p>
+            <p>
+                How did you make it?!<br>
+                {{ form.steps(cols="40", rows="3",
+                class_='btn btn-default') }}<br>
+            </p>
+            <style>
+                .hidden{
+                    visibility: hidden;
+                }
+            </style>
+            <p class="hidden">
+                {{ form.post_id() }}
+            </p>
+            <input type="hidden" name="submit button", value="submit recipe">
+            <p><center>{{ form.submit(class_='btn btn-default') }}</center></p>
+        </form>
+    </div>
+    </div>
     {% endfor %}
     {% else %}
     <center>
@@ -74,9 +72,9 @@
             {% endif %}
         {% else %}
             {% if has_data %}
-                <h2>It seems you haven't cooked anything from this country</h2>
+                <h2>It seems you haven't cooked anything from {{ country_name }}</h2>
             {% else %}
-                <h2>It seems you don't have any available recipe for this country</h2>
+                <h2>It seems you don't have any available recipe for {{ country_name }}</h2>
             {% endif %}
         {% endif %}
     </center>
