@@ -29,10 +29,10 @@ def index():
         if posts.has_next else None
     prev_url = url_for('main.index', page=posts.prev_num) \
         if posts.has_prev else None
-    
+
     if request.method == 'POST':
         button_clicked = request.form.get('submit button')
-        
+
         if button_clicked == 'go to available posts':
             return redirect(url_for('recipes.available_posts'))
 
@@ -44,11 +44,11 @@ def index():
                 return redirect(url_for('recipes.country', country_name=country.name))
             flash('You don\'t have any left country to try.')
             flash('Please search for that country you really want' +
-                'o give another try.')
+                  'o give another try.')
             flash('Or, if you are brave enough, reset the whole list!')
             return redirect(url_for('main.user', username=current_user.username))
-            
-        if button_clicked == 'search user':    
+
+        if button_clicked == 'search user':
             searched_user = User.get_user_by_username(form.search_user_text.data).first()
             if not searched_user is None:
                 return redirect(url_for('main.user', username=searched_user.username))
@@ -81,7 +81,7 @@ def explore():
     if request.method == 'POST':
         button_clicked = request.form.get('submit button')
 
-        if button_clicked == 'search user':    
+        if button_clicked == 'search user':
             searched_user = User.get_user_by_username(form.search_user_text.data).first()
             if not searched_user is None:
                 return redirect(url_for('main.user', username=searched_user.username))
@@ -121,7 +121,7 @@ def user(username):
             Post.delete_posts()
             return redirect(url_for('main.index'))
 
-        if button_clicked == 'search user': 
+        if button_clicked == 'search user':
             searched_user = User.get_user_by_username(form.search_user_text.data).first()
             if not searched_user is None:
                 return redirect(url_for('main.user', username=searched_user.username))
@@ -130,8 +130,8 @@ def user(username):
         if button_clicked == 'search country':
             searched_country = Country.get_country_by_name(form.search_country_text.data).first()
             if not searched_country is None:
-                 return redirect(url_for('recipes.user_country', username=user.username,
-                                         country_name=searched_country.name))
+                return redirect(url_for('recipes.user_country', username=user.username,
+                                        country_name=searched_country.name))
             flash('Country {} not found'.format(form.search_country_text.data))
 
     return render_template('user.html', user=user, posts=posts.items, next_url=next_url,
