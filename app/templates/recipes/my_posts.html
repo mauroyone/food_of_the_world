@@ -4,9 +4,9 @@
     {% if has_data %}
         <h1>Take a look at your creations:</h1>
     {% else %}
-        <h1>Available posts</h1>
+        <h1>Available posts:</h1>
     {% endif %}
-    
+
     {% if search_form %}
     <form action="" method="post">
         {{ search_form.hidden_tag() }}
@@ -21,13 +21,13 @@
     {% for post in posts %}
     <div class="row  text-center">
         <div class="col-md-3">
-            <p><img src="{{ url_for('static', filename='flags/'+post.origin.flag_url) }}"
+            <p><img class="panel panel-default"
+                src="{{ url_for('static', filename='flags/'+post.origin.flag_url) }}"
                 alt="{{ post.origin.name }}'s flag" width="125" height="80">
             </p>
             <p>{{ post.origin.name }}</p>
         </div>
         <div class="col-md-3">
-        
         <form action="" method="post">
             {{ form.hidden_tag() }}
             {% set f = form.recipe.process_data(post.recipe) %}
@@ -60,7 +60,13 @@
             <input type="hidden" name="submit button", value="submit recipe">
             <p>{{ form.submit(class_='btn btn-default') }}</p>
         </form>
-    </div>
+        </div>
+        <div class="col-md-3">
+            <img class="panel panel-default"
+            src="{{ url_for('static',filename=post.image_url) }}"
+            alt="{{ url_for('static',filename=post.image_url) }}"
+            width="125" height="125">
+        </div>
     </div>
     {% endfor %}
     {% else %}

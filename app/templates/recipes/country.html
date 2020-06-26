@@ -4,15 +4,10 @@
     <h1>{{country.name}}</h1>
     <hr>
     <div class="row text-center">
-        <style>
-            .border{
-                border-style: solid;
-                border-width: 1px;
-            }
-        </style>
         <div class='col-md-3'>
-            <img class="border" src="{{ url_for('static', filename='flags/'+country.flag_url) }}"
-                alt="{{ country.name }}'s flag" width="125" height="80">
+            <img class="panel panel-default"
+            src="{{ url_for('static', filename='flags/'+country.flag_url) }}"
+            alt="{{ country.name }}'s flag" width="125" height="80">
         </div>
         <div class='col-md-3'>
             Did you know? <br>

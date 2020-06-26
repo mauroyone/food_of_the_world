@@ -3,12 +3,14 @@
         <p><a href="{{ url_for('main.user', username=post.author.username) }}">
             {{ post.author.username }}
         </a></p>
-        <p><img src="{{ post.author.avatar(70) }}" /></p>
+        <p><img class="panel panel-default"
+            src="{{ post.author.avatar(70) }}"></p>
         <p>{{ moment(post.timestamp).format('LLL') }}</p>
     </div>
     <div class="col-md-3">
         <p>A recipe from:</p>
-        <p><img src="{{ url_for('static', filename='flags/'+post.origin.flag_url) }}"
+        <p><img class="panel panel-default"
+            src="{{ url_for('static', filename='flags/'+post.origin.flag_url) }}"
             alt="{{ post.origin.name }}'s flag"
             width="70" height="45">
         </p>
@@ -20,12 +22,10 @@
             {{ post.recipe }}
         </p>
         <p>
-            Ingredients:<br>
-            {{ post.ingredients }}
-        </p>
-        <p>
-            Steps:<br>
-            {{ post.steps }}
+            <img class="panel panel-default"
+            src="{{ url_for('static',filename=post.image_url) }}"
+            alt="{{ url_for('static',filename=post.image_url) }}"
+            width="125" height="125">
         </p>
     </div>
 </div>
