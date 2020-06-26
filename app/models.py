@@ -83,7 +83,7 @@ class User(UserMixin, db.Model):
         return User.query.filter_by(email=email)
 
     def __repr__(self):
-        return '<User {}>'.format(self.username)
+        return '<User {}\nId {}>'.format(self.username, self.id)
 
 
 class Country(db.Model):
@@ -107,9 +107,7 @@ class Country(db.Model):
             for line in file:
                 line = line.rstrip()
                 line = line.split(',')
-                subline = line[2].split(' ')
-                url = ('https://www.countries-ofthe-world.com/flags-normal/flag-of-' +
-                       '-'.join(subline) + '.png')
+                url = line[2] + ' - flag.jpg'
                 country = Country(name=line[0].upper(), capital=line[1],
                                   flag_url=url)
                 db.session.add(country)
@@ -145,6 +143,7 @@ class Post(db.Model):
     steps = db.Column(db.String(4096), default='')
     submitted = db.Column(db.Boolean, index=True, default=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    image_url = db.Column(db.String(128), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
 
@@ -222,8 +221,9 @@ class Post(db.Model):
 
     @staticmethod
     def get_others_posts_by_country_id(country_id):
-        return Post.query.filter(Post.submitted and Post.user_id != current_user.id and 
-                                 Post.country_id == country_id).order_by(Post.timestamp.desc())
+        return Post.query.filter(Post.submitted).filter(
+            Post.user_id != current_user.id).filter(
+                Post.country_id == country_id).order_by(Post.timestamp.desc())
 
     @staticmethod
     def get_posts_by_user_and_country_ids(user_id, country_id):
@@ -232,8 +232,7 @@ class Post(db.Model):
 
     @staticmethod
     def user_has_post_in_country(user_id, country_id):
-        return not (Post.query.filter(Post.user_id == user_id and
-            Post.country_id == country_id) is None)
+        return not (Post.query.filter_by(user_id=user_id, country_id=country_id).first() is None)
 
     @staticmethod
     def count_different_countries_with_posts():

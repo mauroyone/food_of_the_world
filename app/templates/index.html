@@ -4,7 +4,7 @@
 {% block app_content %}
     <h1>Hi, {{ current_user.username }}!</h1>
     {% if index %}
-    <div class="row">
+    <div class="row text-center">
         <div class="col-md-3">
             <p>You have a total of {{ amount_of_available_countries }}
             countries yet to taste!</p>
@@ -29,7 +29,7 @@
         </div>
     </div>
     {% endif %}
-    <div class="row">
+    <div class="row text-center">
         <div class="col-md-3">
             <form action="" method="post">
                 {{ form.hidden_tag() }}

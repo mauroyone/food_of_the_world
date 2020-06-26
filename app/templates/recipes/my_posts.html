@@ -19,14 +19,15 @@
     <hr>
     {% if posts %}
     {% for post in posts %}
-    <div class="row">
+    <div class="row  text-center">
         <div class="col-md-3">
-            <p><img src="{{ post.origin.flag_url }}"
+            <p><img src="{{ url_for('static', filename='flags/'+post.origin.flag_url) }}"
                 alt="{{ post.origin.name }}'s flag" width="125" height="80">
             </p>
-            <p><center>{{ post.origin.name }}</center></p>
+            <p>{{ post.origin.name }}</p>
         </div>
         <div class="col-md-3">
+        
         <form action="" method="post">
             {{ form.hidden_tag() }}
             {% set f = form.recipe.process_data(post.recipe) %}
@@ -35,17 +36,17 @@
             {% set f = form.post_id.process_data(post.id) %}
             <p>
                 What did you cook?<br>
-                {{ form.recipe(cols="40", rows="1",
+                {{ form.recipe(rows="1",
                 class_='btn btn-default') }}<br>
             </p>
             <p>
                 What did you use?<br>
-                {{ form.ingredients(cols="40", rows="2",
+                {{ form.ingredients(rows="2",
                 class_='btn btn-default') }}<br>
             </p>
             <p>
                 How did you make it?!<br>
-                {{ form.steps(cols="40", rows="3",
+                {{ form.steps(rows="3",
                 class_='btn btn-default') }}<br>
             </p>
             <style>
@@ -57,7 +58,7 @@
                 {{ form.post_id() }}
             </p>
             <input type="hidden" name="submit button", value="submit recipe">
-            <p><center>{{ form.submit(class_='btn btn-default') }}</center></p>
+            <p>{{ form.submit(class_='btn btn-default') }}</p>
         </form>
     </div>
     </div>

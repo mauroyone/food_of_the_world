@@ -3,60 +3,59 @@
 {% block app_content %}
     <h1>{{country.name}}</h1>
     <hr>
-    <table>
-        <tr valign="center">
-            <td>
-                <style>
-                    .border{
-                        border-style: solid;
-                        border-width: 1px;
-                    }
-                </style>
-                <img class="border" src="{{ country.flag_url}}"
+    <div class="row text-center">
+        <style>
+            .border{
+                border-style: solid;
+                border-width: 1px;
+            }
+        </style>
+        <div class='col-md-3'>
+            <img class="border" src="{{ url_for('static', filename='flags/'+country.flag_url) }}"
                 alt="{{ country.name }}'s flag" width="125" height="80">
-            </td>
-            <td>
-            <center>
-                Did you know? <br>
-                {{ country.name }}'s capital city is:
-                {{ country.capital }}<br>
-            </center>
+        </div>
+        <div class='col-md-3'>
+            Did you know? <br>
+            {{ country.name }}'s capital city is:
+            {{ country.capital }}<br>
             <form action="" method="post">
             {{ form.hidden_tag() }}
-                {% if already_picked %}
-                    <center><p>
-                        <input type="hidden" name="submit button",
-                        value="select country">
-                        {{ form.submit(value='Try now!',
-                        class_='btn btn-default') }}
-                    </p></center>
-                {% else %}
-                    <center><p>
-                        <input type="hidden" name="submit button",
-                        value="select country">
-                        {{ form.submit(value='Give it a shot?',
-                        class_='btn btn-default') }}
-                    </p></center>
-                {% endif %}
+            <p>
+            {% if already_picked %}
+                <input type="hidden" name="submit button",
+                value="select country">
+                {{ form.submit(value='Try now!',
+                class_='btn btn-default') }}
+            {% else %}
+                <input type="hidden" name="submit button",
+                value="select country">
+                {{ form.submit(value='Give it a shot?',
+                class_='btn btn-default') }}
+            {% endif %}
+            </p>
             </form>
-            </td>
-            <td>
-                <form action="" method="post">
-                    {{ form.hidden_tag() }}
-                    {{ form.search_user_text.label }} <br>
-                    {{ form.search_user_text(cols="20", rows="1", class_='btn btn-default') }}
-                    <input type="hidden" name="submit button", value="search user">
-                    {{ form.submit(value="Search user", class_='btn btn-default') }}
-                </form></td>
-                <td><form action="" method="post">
-                    {{ form.hidden_tag() }}
-                    {{ form.search_country_text.label }} <br>
-                    {{ form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
-                    <input type="hidden" name="submit button", value="search country">
-                    {{ form.submit(value="Search country", class_='btn btn-default') }}
-                </form>
-            </td>
-    </table>
+        </div>
+    </div>
+    <div class="row text-center">
+        <div class="col-md-3">
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                {{ form.search_user_text.label }} <br>
+                {{ form.search_user_text(cols="20", rows="1", class_='btn btn-default') }}
+                <input type="hidden" name="submit button", value="search user">
+                {{ form.submit(value="Search user", class_='btn btn-default') }}
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                {{ form.search_country_text.label }} <br>
+                {{ form.search_country_text(cols="20", rows="1", class_='btn btn-default') }}
+                <input type="hidden" name="submit button", value="search country">
+                {{ form.submit(value="Search country", class_='btn btn-default') }}
+            </form>
+        </div>
+    </div>
     <hr>
     {% if posts %}
         {% if user %}
