@@ -2,9 +2,12 @@ from random import randint
 from time import time
 from datetime import datetime
 from hashlib import md5
+from pathlib import Path
+from os import makedirs
+from os.path import exists
 import jwt
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask import current_app
+from flask import current_app, url_for
 from flask_login import UserMixin, current_user
 from app import db, login
 
@@ -143,7 +146,7 @@ class Post(db.Model):
     steps = db.Column(db.String(4096), default='')
     submitted = db.Column(db.Boolean, index=True, default=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    image_url = db.Column(db.String(128), index=True)
+    image_url = db.Column(db.String(128), index=True, default='')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
 
@@ -171,11 +174,22 @@ class Post(db.Model):
         db.session.commit()
         return 1
 
+    def create_image_url(self):
+        raw_path = 'recipes/users/{}/countries/{}/posts'.format(
+            self.user_id, self.country_id)
+        path = Path('app/static/' + raw_path)
+        self.image_url = raw_path +'/{}.jpg'.format(self.id)
+        db.session.add(self)
+        db.session.commit()
+        if not exists(path):
+            makedirs(path)
+
     @staticmethod
     def create_empty_post(country_id):
         post = Post(user_id=current_user.id, country_id=country_id)
         db.session.add(post)
         db.session.commit()
+        post.create_image_url()
 
     @staticmethod
     def delete_posts():
@@ -207,7 +221,7 @@ class Post(db.Model):
         return Post.query.filter_by(submitted=False,
                                     user_id=current_user.id).order_by(
                                         Post.timestamp.desc())
-    
+
     @staticmethod
     def get_my_available_posts_by_country_id(country_id):
         return Post.query.filter_by(submitted=False, country_id=country_id,
@@ -232,7 +246,7 @@ class Post(db.Model):
 
     @staticmethod
     def user_has_post_in_country(user_id, country_id):
-        return not (Post.query.filter_by(user_id=user_id, country_id=country_id).first() is None)
+        return not Post.query.filter_by(user_id=user_id, country_id=country_id).first() is None
 
     @staticmethod
     def count_different_countries_with_posts():
