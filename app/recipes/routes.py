@@ -8,24 +8,23 @@ from app.recipes import bp
 @bp.route('/country/<country_name>', methods=['GET', 'POST'])
 @login_required
 def country(country_name):
-    form = SearchForm()
-
-
     country = Country.get_country_by_name(country_name).first()
     if country is None:
         flash('Country {} not found.'.format(country_name))
         return redirect(url_for('main.index'))
 
+    form = SearchForm()
     already_picked = Post.user_has_post_in_country(current_user.id, country.id)
 
     if request.method == 'POST':
         button_clicked = request.form.get('submit button')
 
         if button_clicked == 'select country':
-            Post.create_empty_post(country.id)
+            if not already_picked:
+                Post.create_empty_post(country.id)
             return redirect(url_for('recipes.available_posts', country_name='all'))
 
-        if button_clicked == 'search user': 
+        if button_clicked == 'search user':
             searched_user = User.get_user_by_username(form.search_user_text.data).first()
             if not searched_user is None:
                 return redirect(url_for('recipes.user_country', username=searched_user.username,
@@ -37,7 +36,7 @@ def country(country_name):
             if not searched_country is None:
                 return redirect(url_for('recipes.country',country_name=searched_country.name))
             flash('Country {} not found'.format(form.search_country_text.data))
-                
+
     page = request.args.get('page', 1, type=int)
     posts = Post.get_others_posts_by_country_id(country.id).paginate(
         page, current_app.config['POSTS_PER_PAGE'], False)
@@ -46,9 +45,9 @@ def country(country_name):
     prev_url = url_for('recipes.country_by_user', country_name=country_name, page=posts.prev_num) \
         if posts.has_prev else None
 
-    return render_template('recipes/country.html', title='{}'.format(country_name), 
-                            country=country, form=form, already_picked=already_picked,
-                            posts=posts.items, next_url=next_url, prev_url=prev_url)
+    return render_template('recipes/country.html', title='{}'.format(country_name),
+                           country=country, form=form, already_picked=already_picked,
+                           posts=posts.items, next_url=next_url, prev_url=prev_url)
 
 @bp.route('/available_posts/<country_name>', methods=['GET', 'POST'])
 @login_required
@@ -80,7 +79,6 @@ def available_posts(country_name):
         if not searched_country is None:
             return redirect(url_for('recipes.available_posts', country_name=searched_country.name))
         flash('Country {} not found'.format(search_form.search_country_text.data))
-            
 
     if form.validate_on_submit():
         post = Post.get_post_by_id(form.post_id.data).first()
@@ -93,8 +91,9 @@ def available_posts(country_name):
         return redirect(url_for('recipes.my_posts', country_name='all'))
 
     return render_template('recipes/my_posts.html', title='Available posts',
-                           form=form, search_form=search_form, country_name=country_name.capitalize(),
-                           posts=available_posts.items, has_data=False, general=general,
+                           form=form, search_form=search_form, posts=available_posts.items,
+                           country_name=country_name.capitalize(),
+                           has_data=False, general=general,
                            next_url=next_url, prev_url=prev_url)
 
 @bp.route('/my_posts/<country_name>', methods=['GET', 'POST'])
