@@ -181,7 +181,7 @@ class Post(db.Model):
     def create_image_url(self):
         path = 'recipes/users/{}/countries/{}/posts'.format(
             self.user_id, self.country_id)
-        self.image_url = os.path.join(path, '{}.jpg'.format(self.id))
+        self.image_url = os.path.join(path, '{}.jpg?{}'.format(self.id, randint(0,10000)))
         db.session.add(self)
         db.session.commit()
         path = os.path.join('app/static/', path)

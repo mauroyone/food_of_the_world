@@ -89,6 +89,7 @@ def available_posts(country_name):
         post.submit(recipe=form.recipe.data, ingredients=form.ingredients.data,
                     steps=form.steps.data)
         flash('Your post is now alive!')
+        
         return redirect(url_for('recipes.my_posts', country_name='all'))
 
     return render_template('recipes/my_posts.html', title='Available posts',
@@ -194,8 +195,10 @@ def upload(post_id):
         f = request.files.get('file')
         filename = f.filename
         if filename.split('.')[1] in allowed_extentions:
-            #if os.path.isfile(path):
-            #    os.remove(path)
+            if os.path.isfile(path):
+                os.remove(path)
+                post.create_image_url()
+                path = os.getcwd() + '/app/static/' + post.image_url
             f.save(path)
             post.set_has_image(True)
             return 'Image updated'
