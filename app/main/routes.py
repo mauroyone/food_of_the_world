@@ -34,7 +34,7 @@ def index():
         button_clicked = request.form.get('submit button')
 
         if button_clicked == 'go to available posts':
-            return redirect(url_for('recipes.available_posts'))
+            return redirect(url_for('recipes.available_posts', country_name='all'))
 
         if button_clicked == 'pick country':
             if amount_of_available_countries:
@@ -44,7 +44,7 @@ def index():
                 return redirect(url_for('recipes.country', country_name=country.name))
             flash('You don\'t have any left country to try.')
             flash('Please search for that country you really want' +
-                  'o give another try.')
+                  'to give another try.')
             flash('Or, if you are brave enough, reset the whole list!')
             return redirect(url_for('main.user', username=current_user.username))
 

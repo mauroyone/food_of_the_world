@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from app.recipes.forms import RecipePostForm, SearchForm
 from app.models import User, Country, Post
 from app.recipes import bp
+import os
 
 
 @bp.route('/country/<country_name>', methods=['GET', 'POST'])
@@ -179,3 +180,24 @@ def user_country(username, country_name):
     return render_template('recipes/country.html', title='{}'.format(country_name), 
                             user=user, country=country, form=form, 
                             posts=posts.items, next_url=next_url, prev_url=prev_url)
+
+@bp.route('/uploads/post/<post_id>', methods=['GET', 'POST'])
+def upload(post_id):
+    post = Post.get_post_by_id(post_id).first()
+    if post is None:
+        flash('Post {} not found.'.format(post.id))
+        return redirect(url_for('main.index'))
+    
+    if request.method == 'POST':
+        allowed_extentions = ['jpeg', 'jpg', 'png']
+        path = os.getcwd() + '/app/static/' + post.image_url
+        f = request.files.get('file')
+        filename = f.filename
+        if filename.split('.')[1] in allowed_extentions:
+            #if os.path.isfile(path):
+            #    os.remove(path)
+            f.save(path)
+            post.set_has_image(True)
+            return 'Image updated'
+
+    return 'Nothing to see here' 

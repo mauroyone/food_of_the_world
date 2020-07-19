@@ -3,9 +3,8 @@ from time import time
 from datetime import datetime
 from hashlib import md5
 from pathlib import Path
-from os import makedirs
-from os.path import exists
-import jwt
+import os
+from jwt import encode, decode
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app, url_for
 from flask_login import UserMixin, current_user
@@ -64,14 +63,14 @@ class User(UserMixin, db.Model):
                                        Post.timestamp.desc())
 
     def get_reset_password_token(self, expires_in=600):
-        return jwt.encode(
+        return encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(token, app.config['SECRET_KEY'],
+            id = decode(token, app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
         except:
             return
@@ -147,11 +146,16 @@ class Post(db.Model):
     submitted = db.Column(db.Boolean, index=True, default=False)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     image_url = db.Column(db.String(128), index=True, default='')
+    has_image = db.Column(db.Boolean, index=True, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     country_id = db.Column(db.Integer, db.ForeignKey('country.id'))
 
-    def set_submitted(self, value):
-        self.submitted = value
+    def set_has_image(self, value):
+        self.has_image = value
+        db.session.commit()
+
+    def get_has_image(self):
+        return self.has_image
 
     def submit(self, recipe, ingredients, steps):
         self.recipe = recipe
@@ -175,14 +179,14 @@ class Post(db.Model):
         return 1
 
     def create_image_url(self):
-        raw_path = 'recipes/users/{}/countries/{}/posts'.format(
+        path = 'recipes/users/{}/countries/{}/posts'.format(
             self.user_id, self.country_id)
-        path = Path('app/static/' + raw_path)
-        self.image_url = raw_path +'/{}.jpg'.format(self.id)
+        self.image_url = os.path.join(path, '{}.jpg'.format(self.id))
         db.session.add(self)
         db.session.commit()
-        if not exists(path):
-            makedirs(path)
+        path = os.path.join('app/static/', path)
+        if not os.path.exists(path):
+            os.makedirs(path)
 
     @staticmethod
     def create_empty_post(country_id):
@@ -231,7 +235,7 @@ class Post(db.Model):
     @staticmethod
     def get_my_countries_with_posts():
         countries_with_posts = Post.query.filter_by(user_id=current_user.id).all()
-        return [picked_country.id for picked_country in countries_with_posts]
+        return [picked_country.country_id for picked_country in countries_with_posts]
 
     @staticmethod
     def get_others_posts_by_country_id(country_id):

@@ -61,11 +61,19 @@
             <p>{{ form.submit(class_='btn btn-default') }}</p>
         </form>
         </div>
+        {% if post.has_image %}
         <div class="col-md-3">
             <img class="panel panel-default"
-            src="{{ url_for('static',filename=post.image_url) }}"
-            alt="{{ url_for('static',filename=post.image_url) }}"
+            src="{{ url_for('static', filename=post.image_url) }}"
+            alt="{{ url_for('static', filename=post.image_url) }}"
             width="125" height="125">
+        </div>
+        {% endif %}
+        {{ dropzone.load_css() }}
+        {{ dropzone.style('border: 2px dashed #0087F7; margin: 10%; min-height: 40px;') }}
+        <div class="col-md-3">
+            {{ dropzone.load_js() }}
+            {{ dropzone.create(action = url_for('recipes.upload', post_id=post.id)) }}
         </div>
     </div>
     {% endfor %}
