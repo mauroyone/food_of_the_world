@@ -26,3 +26,4 @@ Features:
 
  To Do:
   - Get recommendations for typical dishes!
+  - Deploy the app
